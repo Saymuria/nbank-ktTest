@@ -1,0 +1,199 @@
+//Для позитивных сценариев достаточно одного тест-кейса
+//Для негативных сценариев, необходимо создать тест-кейс под проверку каждого негативного условия
+
+### Get admin auth token
+### Admin token Authorization: Basic YWRtaW46YWRtaW4=
+POST http://localhost:4111/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "wLlMdE",
+  "password": "verysTRongPassword33$"
+}
+
+###Positive case: Admin can create user with valid data
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "{{$random.alphabetic(6)}}",
+  "password": "verysTRongPassword33$",
+  "role": "USER"
+}
+
+###Negative case: Admin cannot create user with blank username
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "   ",
+  "password": "verysTRongPassword33$",
+  "role": "USER"
+}
+
+###Negative case: Admin cannot create user with username of 2 symbols
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "{{$random.alphabetic(2)}}",
+  "password": "verysTRongPassword33$",
+  "role": "USER"
+}
+
+###Negative case: Admin cannot create user with username of 16 symbols
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "{{$random.alphabetic(16)}}",
+  "password": "verysTRongPassword33$",
+  "role": "USER"
+}
+
+###Positive case: Admin can create user with letters, digits, _-. in username
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "{{$random.alphabetic(5)}}-_1.",
+  "password": "verysTRongPassword33$",
+  "role": "USER"
+}
+###Negative case: Admin cannot create user without special character(!@#$%^&*()+=) in username
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "!@#$%^&*()+=",
+  "password": "verysTRongPassword33$",
+  "role": "USER"
+}
+
+###Negative case: Admin cannot create user with blank password
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "{{$random.alphabetic(5)}}",
+  "password": "    ",
+  "role": "USER"
+}
+
+###Negative case: Admin cannot create user with password less than 8 symbols
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "{{$random.alphabetic(5)}}",
+  "password": "Djf2@4o",
+  "role": "USER"
+}
+
+###Negative case: Admin cannot create user without lower case letters in password
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "{{$random.alphabetic(5)}}",
+  "password": "DD452@40",
+  "role": "USER"
+}
+
+
+###Negative case: Admin cannot create user without upper case letters in password
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "{{$random.alphabetic(5)}}",
+  "password": "fkd452@40",
+  "role": "USER"
+}
+
+###Negative case: Admin cannot create user without digits in password
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "{{$random.alphabetic(5)}}",
+  "password": "fkdfdD@fdf",
+  "role": "USER"
+}
+
+###Negative case: Admin cannot create user without special character in password
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "{{$random.alphabetic(5)}}",
+  "password": "fkdfdD3fdf",
+  "role": "USER"
+}
+
+###Negative case: Admin cannot create user with spaces in password
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "{{$random.alphabetic(5)}}",
+  "password": "fkdfdD  3fdf",
+  "role": "USER"
+}
+
+###Negative case: Admin cannot create user with role not in list(ADMIN, USER)
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "{{$random.alphabetic(5)}}",
+  "password": "fkdfdD3fdf",
+  "role": "EDITOR"
+}
+
+
+###Negative case: Admin cannot create that already exists
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "wLlMdE",
+  "password": "verysTRongPassword33$",
+  "role": "USER"
+}
+
+###Negative case: Admin cannot create user with blank username
+POST http://localhost:4111/api/v1/admin/users
+Content-Type: application/json
+Authorization: Basic YWRtaW46YWRtaW4=
+
+{
+  "username": "wLlMdE",
+  "password": "verysTRongPassword33$",
+  "role": "USER"
+}
+
+###Positive case: Authorized user can create account
+POST http://localhost:4111/api/v1/accounts
+Content-Type: application/json
+Authorization: Basic d0xsTWRFOnZlcnlzVFJvbmdQYXNzd29yZDMzJA==
+
+###Check user account creation
+GET http://localhost:4111/api/v1/customer/accounts
+Content-Type: application/json
+Authorization: Basic d0xsTWRFOnZlcnlzVFJvbmdQYXNzd29yZDMzJA==

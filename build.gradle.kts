@@ -10,7 +10,9 @@ repositories {
 }
 
 dependencies {
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.1")
     testImplementation(kotlin("test"))
+    testImplementation("io.rest-assured:rest-assured:5.4.0")
 }
 
 tasks.test {
