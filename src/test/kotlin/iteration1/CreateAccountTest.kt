@@ -8,7 +8,6 @@ import io.restassured.http.ContentType
 import org.apache.http.HttpHeaders.AUTHORIZATION
 import org.apache.http.HttpStatus.SC_CREATED
 import org.apache.http.HttpStatus.SC_OK
-import org.hamcrest.Matchers
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 
