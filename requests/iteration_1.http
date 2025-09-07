@@ -65,7 +65,7 @@ Authorization: Basic YWRtaW46YWRtaW4=
   "password": "verysTRongPassword33$",
   "role": "USER"
 }
-###Negative case: Admin cannot create user without special character(!@#$%^&*()+=) in username
+###Negative case: Admin cannot create user with special character(!@#$%^&*()+=) in username
 POST http://localhost:4111/api/v1/admin/users
 Content-Type: application/json
 Authorization: Basic YWRtaW46YWRtaW4=

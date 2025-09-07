@@ -15,6 +15,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
+import java.util.Random
 
 class CreateUserTest {
 
@@ -34,10 +35,10 @@ class CreateUserTest {
             return Stream.of(
                 Arguments.of("   ", "verysTRongPassword33$", "USER", "username", "Username cannot be blank"),
                 Arguments.of("ab", "verysTRongPassword33$", "USER", "username", "Username must be between 3 and 15 characters"),
-                Arguments.of("abshdfkdofdfjdfd", "verysTRongPassword33$", "USER", "Username must be between 3 and 15 characters"),
-                Arguments.of("   ", "verysTRongPassword33$", "USER", "username", "Username cannot be blank"),
-                Arguments.of("   ", "verysTRongPassword33$", "USER", "username", "Username cannot be blank"),
-                Arguments.of("   ", "verysTRongPassword33$", "USER", "username", "Username cannot be blank"),
+                Arguments.of("abshdfkdofdfjdfd", "verysTRongPassword33$", "USER", "username", "Username must be between 3 and 15 characters"),
+                Arguments.of("!@#$%^&*()+=", "verysTRongPassword33$", "USER", "username", "Username must contain only letters, digits, dashes, underscores, and dots"),
+                Arguments.of("dkdgld8304_1", "   ", "USER", "password", "Password cannot be blank"),
+                Arguments.of("dkdgld8304_2", "Djf2@4o", "USER", "password", "Password must contain at least one digit, one lower case, one upper case, one special character, no spaces, and be at least 8 characters long"),
             )
         }
     }
