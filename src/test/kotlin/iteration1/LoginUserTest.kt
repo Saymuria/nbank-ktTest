@@ -1,88 +1,35 @@
 package iteration1
 
-import io.restassured.RestAssured
-import io.restassured.RestAssured.given
-import io.restassured.filter.log.RequestLoggingFilter
-import io.restassured.filter.log.ResponseLoggingFilter
-import io.restassured.http.ContentType
+import generators.RandomData.Companion.getUserName
+import generators.RandomData.Companion.getUserPassword
+import models.CreateUserRequest
+import models.LoginUserRequest
+import models.UserRole
 import org.apache.http.HttpHeaders.AUTHORIZATION
-import org.apache.http.HttpStatus.SC_CREATED
-import org.apache.http.HttpStatus.SC_OK
-import org.hamcrest.Matchers
-import org.junit.jupiter.api.BeforeAll
+import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.Test
+import requests.AdminCreateUserRequester
+import requests.LoginUserRequester
+import specs.RequestSpecs
+import specs.ResponseSpec
 
-class LoginUserTest {
-
-    companion object {
-        @JvmStatic
-        @BeforeAll
-        fun setupRestAssured() {
-            RestAssured.filters(
-                listOf(
-                    RequestLoggingFilter(), ResponseLoggingFilter()
-                )
-            )
-        }
-    }
+class LoginUserTest : BaseTest(){
 
     //Название теста должно совпадать с требованием, которое он проверяет
     @Test
     fun adminCanGenerateAuthTokenTest() {
-        given()
-            .contentType(ContentType.JSON)
-            .accept(ContentType.JSON)
-            .body(
-                """
-                    {
-                    "username": "admin",
-                    "password": "admin"
-                    }
-                """
-            )
-            .post("http://localhost:4111/api/v1/auth/login")
-            .then()
-            .assertThat()
-            .statusCode(SC_OK)
-            .header("Authorization", "Basic YWRtaW46YWRtaW4=")
+        val userRequest = LoginUserRequest("admin", "admin")
+        LoginUserRequester(RequestSpecs.unAuthSpec(), ResponseSpec.requestReturnOk()).post(userRequest)
     }
 
     @Test
     fun userCanGenerateAuthTokenTest() {
+        val userData = CreateUserRequest(getUserName(), getUserPassword(), UserRole.USER.toString())
         //создание пользователя
-        given()
-            .contentType(ContentType.JSON)
-            .accept(ContentType.JSON)
-            .header(AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
-            .body(
-                """
-                    {
-                        "username": "sasha1393123",
-                        "password": "verysTRongPassword33$",
-                        "role": "USER"
-                    }"""
-            )
-            .post("http://localhost:4111/api/v1/admin/users")
-            .then()
-            .assertThat()
-            .statusCode(SC_CREATED)
-
+        AdminCreateUserRequester(RequestSpecs.adminAuthSpec(), ResponseSpec.entityWasCreated()).post(userData)
         //получение авторизации
-        given()
-            .contentType(ContentType.JSON)
-            .accept(ContentType.JSON)
-            .body(
-                """
-                    {
-                    "username": "sasha1393123", 
-                    "password": "verysTRongPassword33$"
-                    }
-                """
-            )
-            .post("http://localhost:4111/api/v1/auth/login")
-            .then()
+        LoginUserRequester(RequestSpecs.unAuthSpec(), ResponseSpec.requestReturnOk()).post(userData)
             .assertThat()
-            .statusCode(SC_OK)
-            .header("Authorization", Matchers.notNullValue())
+            .header(AUTHORIZATION, notNullValue())
     }
 }

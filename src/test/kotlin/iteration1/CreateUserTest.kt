@@ -1,34 +1,21 @@
 package iteration1
 
-import io.restassured.RestAssured
-import io.restassured.RestAssured.given
-import io.restassured.filter.log.RequestLoggingFilter
-import io.restassured.filter.log.ResponseLoggingFilter
-import io.restassured.http.ContentType
-import org.apache.http.HttpHeaders.AUTHORIZATION
-import org.apache.http.HttpStatus.SC_BAD_REQUEST
-import org.apache.http.HttpStatus.SC_CREATED
-import org.hamcrest.Matchers
-import org.junit.jupiter.api.BeforeAll
+import generators.RandomData
+import models.CreateUserRequest
+import models.CreateUserResponse
+import models.UserRole
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import requests.AdminCreateUserRequester
+import specs.RequestSpecs
+import specs.ResponseSpec
 import java.util.stream.Stream
-import java.util.Random
 
-class CreateUserTest {
+class CreateUserTest : BaseTest() {
 
     companion object {
-        @JvmStatic
-        @BeforeAll
-        fun setupRestAssured() {
-            RestAssured.filters(
-                listOf(
-                    RequestLoggingFilter(), ResponseLoggingFilter()
-                )
-            )
-        }
 
         @JvmStatic
         fun userInvalidData(): Stream<Arguments> {
@@ -45,26 +32,14 @@ class CreateUserTest {
 
     @Test
     fun adminCanCreateUserWithCorrectData() {
+        val createUserRequest = CreateUserRequest(username = RandomData.getUserName(), password = RandomData.getUserPassword(), role = UserRole.USER.toString())
         //создание пользователя
-        given()
-            .contentType(ContentType.JSON)
-            .accept(ContentType.JSON)
-            .header(AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
-            .body(
-                """
-                    {
-                        "username": "sasha11238",
-                        "password": "verysTRongPassword33$",
-                        "role": "USER"
-                    }"""
-            )
-            .post("http://localhost:4111/api/v1/admin/users")
-            .then()
-            .assertThat()
-            .statusCode(SC_CREATED)
-            .body("username", Matchers.equalTo("sasha11238"))
-            .body("password", Matchers.not(Matchers.equalTo("verysTRongPassword33$")))
-            .body("role", Matchers.equalTo("USER"))
+        val createUserResponse = AdminCreateUserRequester(RequestSpecs.adminAuthSpec(), ResponseSpec.entityWasCreated()).post(createUserRequest)
+            .extract().`as`(CreateUserResponse::class.java)
+
+        softly.assertThat(createUserRequest.username).isEqualTo(createUserResponse.username)
+        softly.assertThat(createUserRequest.password).isNotEqualTo(createUserResponse.password)
+        softly.assertThat(createUserRequest.role).isEqualTo(createUserResponse.role)
     }
 
 
@@ -77,23 +52,9 @@ class CreateUserTest {
         keyError: String,
         valueError: String
     ) {
-        val requestBody = String.format(
-            """{
-                        "username": "%s",
-                        "password": "%s",
-                        "role": "%s"
-                    }""", username, password, role
-        )
-        //создание пользователя
-        given()
-            .contentType(ContentType.JSON)
-            .accept(ContentType.JSON)
-            .header(AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
-            .body(requestBody)
-            .post("http://localhost:4111/api/v1/admin/users")
-            .then()
-            .assertThat()
-            .statusCode(SC_BAD_REQUEST)
-            .body(keyError, Matchers.equalTo(valueError))
+        val createUserRequest = CreateUserRequest(username = username, password = password, role = role)
+
+        AdminCreateUserRequester(RequestSpecs.adminAuthSpec(), ResponseSpec.requestReturnsBadRequest(keyError, valueError)).post(createUserRequest)
+            .extract().`as`(CreateUserResponse::class.java)
     }
 }

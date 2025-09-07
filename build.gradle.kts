@@ -12,7 +12,10 @@ repositories {
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.1")
     testImplementation(kotlin("test"))
-    testImplementation("io.rest-assured:rest-assured:5.4.0")
+    testImplementation("org.assertj:assertj-core:3.24.2")
+    implementation("io.rest-assured:rest-assured:5.4.0")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")
 }
 
 tasks.test {
