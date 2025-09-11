@@ -1,0 +1,38 @@
+package requests.skeleton.requesters
+
+import io.restassured.specification.RequestSpecification
+import io.restassured.specification.ResponseSpecification
+import models.BaseModel
+import requests.skeleton.Endpoint
+import requests.skeleton.HttpRequest
+import requests.skeleton.interfaces.CrudEndpointInterface
+
+class ValidatedCrudRequester<T : BaseModel>(
+    requestSpecification: RequestSpecification,
+    responseSpecification: ResponseSpecification,
+    endpoint: Endpoint
+) : HttpRequest(requestSpecification, responseSpecification, endpoint), CrudEndpointInterface {
+
+    private val crudRequester = CrudRequester(requestSpecification, responseSpecification, endpoint)
+
+    override fun post(model: BaseModel?): T {
+        return crudRequester.post(model)
+            .extract()
+            .`as`(endpoint.responseModel.java) as T
+    }
+
+
+
+    override fun get(id: Long): T {
+        TODO("Not yet implemented")
+    }
+
+    override fun update(id: Long, model: BaseModel): T {
+        TODO("Not yet implemented")
+    }
+
+    override fun delete(id: Long) {
+        TODO("Not yet implemented")
+    }
+
+}

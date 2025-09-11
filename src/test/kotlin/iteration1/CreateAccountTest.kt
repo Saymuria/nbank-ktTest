@@ -8,9 +8,8 @@ import models.LoginUserRequest
 import org.apache.http.HttpHeaders.AUTHORIZATION
 import org.apache.http.HttpStatus.SC_OK
 import org.junit.jupiter.api.Test
-import requests.AdminCreateUserRequester
-import requests.CreateAccountRequester
-import requests.LoginUserRequester
+import requests.skeleton.Endpoint
+import requests.skeleton.requesters.CrudRequester
 import specs.RequestSpecs
 import specs.ResponseSpec
 
@@ -18,16 +17,25 @@ class CreateAccountTest {
 
     @Test
     fun userCanAccountTest() {
-        val userRequest = CreateUserRequest(username = RandomData.getUserName(), password = RandomData.getUserPassword(), role = "USER")
+        val userRequest = CreateUserRequest(
+            username = RandomData.getUserName(),
+            password = RandomData.getUserPassword(),
+            role = "USER"
+        )
         val userAuthToken = LoginUserRequest(username = userRequest.username, password = userRequest.password)
-//создание пользователя
-        AdminCreateUserRequester(RequestSpecs.adminAuthSpec(), ResponseSpec.entityWasCreated()).post(userRequest)
+        //создание пользователя
+        CrudRequester(RequestSpecs.adminAuthSpec(), ResponseSpec.entityWasCreated(), Endpoint.ADMIN_USER).post(
+            userRequest
+        )
         //получение авторизации
-        val userAuthHeader = LoginUserRequester(RequestSpecs.unAuthSpec(), ResponseSpec.requestReturnOk()).post(userAuthToken)
-            .extract()
-            .header(AUTHORIZATION)
+        val userAuthHeader =
+            CrudRequester(RequestSpecs.unAuthSpec(), ResponseSpec.requestReturnOk(), Endpoint.LOGIN).post(userAuthToken)
+                .extract().header(AUTHORIZATION)
 
-        CreateAccountRequester(RequestSpecs.authAsUser(userRequest.username,userRequest.password), ResponseSpec.entityWasCreated()).post(null)
+        CrudRequester(
+            RequestSpecs.authAsUser(userRequest.username, userRequest.password),
+            ResponseSpec.entityWasCreated(), Endpoint.ACCOUNTS
+        ).post(null)
         //check account creation
         given()
             .contentType(ContentType.JSON)

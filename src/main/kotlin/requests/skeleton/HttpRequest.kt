@@ -1,18 +1,20 @@
-package requests
+package requests.skeleton
 
-import io.restassured.response.ValidatableResponse
 import io.restassured.specification.RequestSpecification
 import io.restassured.specification.ResponseSpecification
-import models.BaseModel
 
-abstract class Request {
+abstract class HttpRequest {
     protected val requestSpecification: RequestSpecification
     protected val responseSpecification: ResponseSpecification
+    protected val endpoint : Endpoint
 
-    constructor(requestSpecification: RequestSpecification, responseSpecification: ResponseSpecification) {
+    constructor(
+        requestSpecification: RequestSpecification,
+        responseSpecification: ResponseSpecification,
+        endpoint: Endpoint
+    ) {
         this.requestSpecification = requestSpecification
         this.responseSpecification = responseSpecification
+        this.endpoint = endpoint
     }
-
-    abstract fun post(model: BaseModel?) : ValidatableResponse
 }

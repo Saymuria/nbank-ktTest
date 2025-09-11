@@ -1,5 +1,3 @@
 package models
 
-interface BaseModel {
-
-}
+interface BaseModel

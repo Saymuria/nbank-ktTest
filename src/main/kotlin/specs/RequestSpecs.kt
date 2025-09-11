@@ -1,5 +1,6 @@
 package specs
 
+import configs.Config
 import io.restassured.builder.RequestSpecBuilder
 import io.restassured.filter.log.RequestLoggingFilter
 import io.restassured.filter.log.ResponseLoggingFilter
@@ -7,7 +8,8 @@ import io.restassured.http.ContentType
 import io.restassured.specification.RequestSpecification
 import models.LoginUserRequest
 import org.apache.http.HttpHeaders.AUTHORIZATION
-import requests.LoginUserRequester
+import requests.skeleton.Endpoint
+import requests.skeleton.requesters.CrudRequester
 
 class RequestSpecs {
 
@@ -17,7 +19,7 @@ class RequestSpecs {
                 .setContentType(ContentType.JSON)
                 .setAccept(ContentType.JSON)
                 .addFilters(listOf(RequestLoggingFilter(), ResponseLoggingFilter()))
-                .setBaseUri("http://localhost:4111")
+                .setBaseUri(Config.getProperty("server") + Config.getProperty("apiVersion"))
 
         }
         fun unAuthSpec(): RequestSpecification {
@@ -32,7 +34,7 @@ class RequestSpecs {
 
         fun authAsUser(userName: String, password: String): RequestSpecification {
             // получаем токен
-            val userAuthHeader = LoginUserRequester(RequestSpecs.unAuthSpec(), ResponseSpec.requestReturnOk()).post(
+            val userAuthHeader = CrudRequester(unAuthSpec(), ResponseSpec.requestReturnOk(), Endpoint.LOGIN).post(
                 LoginUserRequest(userName, password))
                 .extract()
                 .header(AUTHORIZATION)

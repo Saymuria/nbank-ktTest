@@ -3,13 +3,16 @@ package iteration1
 import generators.RandomData.Companion.getUserName
 import generators.RandomData.Companion.getUserPassword
 import models.CreateUserRequest
+import models.CreateUserResponse
 import models.LoginUserRequest
-import models.UserRole
+import models.LoginUserResponse
+import entities.UserRole
 import org.apache.http.HttpHeaders.AUTHORIZATION
 import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.Test
-import requests.AdminCreateUserRequester
-import requests.LoginUserRequester
+import requests.skeleton.Endpoint
+import requests.skeleton.requesters.CrudRequester
+import requests.skeleton.requesters.ValidatedCrudRequester
 import specs.RequestSpecs
 import specs.ResponseSpec
 
@@ -19,16 +22,16 @@ class LoginUserTest : BaseTest(){
     @Test
     fun adminCanGenerateAuthTokenTest() {
         val userRequest = LoginUserRequest("admin", "admin")
-        LoginUserRequester(RequestSpecs.unAuthSpec(), ResponseSpec.requestReturnOk()).post(userRequest)
+        ValidatedCrudRequester<LoginUserResponse>(RequestSpecs.unAuthSpec(), ResponseSpec.requestReturnOk(), Endpoint.LOGIN).post(userRequest)
     }
 
     @Test
     fun userCanGenerateAuthTokenTest() {
         val userData = CreateUserRequest(getUserName(), getUserPassword(), UserRole.USER.toString())
         //создание пользователя
-        AdminCreateUserRequester(RequestSpecs.adminAuthSpec(), ResponseSpec.entityWasCreated()).post(userData)
+        ValidatedCrudRequester<CreateUserResponse>(RequestSpecs.adminAuthSpec(), ResponseSpec.entityWasCreated(), Endpoint.ADMIN_USER).post(userData)
         //получение авторизации
-        LoginUserRequester(RequestSpecs.unAuthSpec(), ResponseSpec.requestReturnOk()).post(userData)
+        CrudRequester(RequestSpecs.unAuthSpec(), ResponseSpec.requestReturnOk(), Endpoint.LOGIN).post(userData)
             .assertThat()
             .header(AUTHORIZATION, notNullValue())
     }

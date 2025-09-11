@@ -3,12 +3,14 @@ package iteration1
 import generators.RandomData
 import models.CreateUserRequest
 import models.CreateUserResponse
-import models.UserRole
+import entities.UserRole
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import requests.AdminCreateUserRequester
+import requests.skeleton.Endpoint
+import requests.skeleton.requesters.CrudRequester
+import requests.skeleton.requesters.ValidatedCrudRequester
 import specs.RequestSpecs
 import specs.ResponseSpec
 import java.util.stream.Stream
@@ -34,9 +36,11 @@ class CreateUserTest : BaseTest() {
     fun adminCanCreateUserWithCorrectData() {
         val createUserRequest = CreateUserRequest(username = RandomData.getUserName(), password = RandomData.getUserPassword(), role = UserRole.USER.toString())
         //создание пользователя
-        val createUserResponse = AdminCreateUserRequester(RequestSpecs.adminAuthSpec(), ResponseSpec.entityWasCreated()).post(createUserRequest)
-            .extract().`as`(CreateUserResponse::class.java)
-
+        val createUserResponse = ValidatedCrudRequester<CreateUserResponse>(
+            RequestSpecs.adminAuthSpec(),
+            ResponseSpec.entityWasCreated(),
+            Endpoint.ADMIN_USER,
+        ).post(createUserRequest)
         softly.assertThat(createUserRequest.username).isEqualTo(createUserResponse.username)
         softly.assertThat(createUserRequest.password).isNotEqualTo(createUserResponse.password)
         softly.assertThat(createUserRequest.role).isEqualTo(createUserResponse.role)
@@ -53,8 +57,8 @@ class CreateUserTest : BaseTest() {
         valueError: String
     ) {
         val createUserRequest = CreateUserRequest(username = username, password = password, role = role)
-
-        AdminCreateUserRequester(RequestSpecs.adminAuthSpec(), ResponseSpec.requestReturnsBadRequest(keyError, valueError)).post(createUserRequest)
-            .extract().`as`(CreateUserResponse::class.java)
+        CrudRequester(RequestSpecs.adminAuthSpec(),
+            ResponseSpec.requestReturnsBadRequest(keyError, valueError), Endpoint.ADMIN_USER
+        ).post(createUserRequest)
     }
 }

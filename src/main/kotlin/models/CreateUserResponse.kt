@@ -1,7 +1,7 @@
 package models
 
 data class CreateUserResponse(
-    val id: Int?,
+    val id: Long?,
     val username: String?,
     val password: String?,
     val role: String?,
