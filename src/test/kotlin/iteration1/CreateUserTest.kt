@@ -1,6 +1,6 @@
 package iteration1
 
-import generators.RandomData
+import framework.generators.RandomData
 import models.CreateUserRequest
 import models.CreateUserResponse
 import entities.UserRole
@@ -8,11 +8,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import requests.skeleton.Endpoint
-import requests.skeleton.requesters.CrudRequester
-import requests.skeleton.requesters.ValidatedCrudRequester
-import specs.RequestSpecs
-import specs.ResponseSpec
+import framework.skeleton.Endpoint
+import framework.skeleton.requesters.CrudRequester
+import framework.skeleton.requesters.ValidatedCrudRequester
+import framework.specs.RequestSpecs
+import framework.specs.ResponseSpec
 import java.util.stream.Stream
 
 class CreateUserTest : BaseTest() {

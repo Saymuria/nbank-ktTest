@@ -1,4 +1,4 @@
-package assertions
+package framework.assertions
 
 data class FieldMapping(
     val requestField: String,

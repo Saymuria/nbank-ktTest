@@ -1,6 +1,6 @@
 package iteration1
 
-import generators.RandomData
+import framework.generators.RandomData
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import models.CreateUserRequest
@@ -8,10 +8,10 @@ import models.LoginUserRequest
 import org.apache.http.HttpHeaders.AUTHORIZATION
 import org.apache.http.HttpStatus.SC_OK
 import org.junit.jupiter.api.Test
-import requests.skeleton.Endpoint
-import requests.skeleton.requesters.CrudRequester
-import specs.RequestSpecs
-import specs.ResponseSpec
+import framework.skeleton.Endpoint
+import framework.skeleton.requesters.CrudRequester
+import framework.specs.RequestSpecs
+import framework.specs.ResponseSpec
 
 class CreateAccountTest {
 

@@ -1,6 +1,6 @@
-package extentions
+package framework.extentions
 
-import assertions.ModelAssertions
+import framework.assertions.ModelAssertions
 import org.assertj.core.api.SoftAssertions
 
 // Базовое расширение

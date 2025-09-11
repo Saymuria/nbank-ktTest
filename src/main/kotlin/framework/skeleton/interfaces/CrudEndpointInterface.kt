@@ -1,4 +1,4 @@
-package requests.skeleton.interfaces
+package framework.skeleton.interfaces
 
 import models.BaseModel
 

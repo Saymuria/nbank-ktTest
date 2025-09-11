@@ -1,7 +1,7 @@
 package iteration1
 
-import generators.RandomData.Companion.getUserName
-import generators.RandomData.Companion.getUserPassword
+import framework.generators.RandomData.Companion.getUserName
+import framework.generators.RandomData.Companion.getUserPassword
 import models.CreateUserRequest
 import models.CreateUserResponse
 import models.LoginUserRequest
@@ -10,11 +10,11 @@ import entities.UserRole
 import org.apache.http.HttpHeaders.AUTHORIZATION
 import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.Test
-import requests.skeleton.Endpoint
-import requests.skeleton.requesters.CrudRequester
-import requests.skeleton.requesters.ValidatedCrudRequester
-import specs.RequestSpecs
-import specs.ResponseSpec
+import framework.skeleton.Endpoint
+import framework.skeleton.requesters.CrudRequester
+import framework.skeleton.requesters.ValidatedCrudRequester
+import framework.specs.RequestSpecs
+import framework.specs.ResponseSpec
 
 class LoginUserTest : BaseTest(){
 

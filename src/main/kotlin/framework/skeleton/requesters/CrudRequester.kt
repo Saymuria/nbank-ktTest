@@ -1,13 +1,13 @@
-package requests.skeleton.requesters
+package framework.skeleton.requesters
 
 import io.restassured.RestAssured.given
 import io.restassured.response.ValidatableResponse
 import io.restassured.specification.RequestSpecification
 import io.restassured.specification.ResponseSpecification
 import models.BaseModel
-import requests.skeleton.Endpoint
-import requests.skeleton.HttpRequest
-import requests.skeleton.interfaces.CrudEndpointInterface
+import framework.skeleton.Endpoint
+import framework.skeleton.HttpRequest
+import framework.skeleton.interfaces.CrudEndpointInterface
 
 class CrudRequester(requestSpecification: RequestSpecification,
                     responseSpecification: ResponseSpecification, endpoint: Endpoint

@@ -1,4 +1,4 @@
-package requests.skeleton
+package framework.skeleton
 
 import models.BaseModel
 import models.CreateAccountResponse

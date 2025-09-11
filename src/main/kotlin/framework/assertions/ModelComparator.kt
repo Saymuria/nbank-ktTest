@@ -1,4 +1,4 @@
-package assertions
+package framework.assertions
 
 import org.assertj.core.api.SoftAssertions
 

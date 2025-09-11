@@ -1,4 +1,4 @@
-package specs
+package framework.specs
 
 import configs.Config
 import io.restassured.builder.RequestSpecBuilder
@@ -8,8 +8,8 @@ import io.restassured.http.ContentType
 import io.restassured.specification.RequestSpecification
 import models.LoginUserRequest
 import org.apache.http.HttpHeaders.AUTHORIZATION
-import requests.skeleton.Endpoint
-import requests.skeleton.requesters.CrudRequester
+import framework.skeleton.Endpoint
+import framework.skeleton.requesters.CrudRequester
 
 class RequestSpecs {
 

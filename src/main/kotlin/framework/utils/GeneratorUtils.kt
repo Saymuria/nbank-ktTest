@@ -1,6 +1,6 @@
-package utils
+package framework.utils
 
-import generators.EntityGenerator
+import framework.generators.EntityGenerator
 import models.BaseModel
 import kotlin.reflect.KClass
 

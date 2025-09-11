@@ -1,4 +1,4 @@
-package requests.skeleton
+package framework.skeleton
 
 import io.restassured.specification.RequestSpecification
 import io.restassured.specification.ResponseSpecification

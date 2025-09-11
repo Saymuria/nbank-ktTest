@@ -1,4 +1,4 @@
-package specs
+package framework.specs
 
 import io.restassured.builder.ResponseSpecBuilder
 import io.restassured.specification.ResponseSpecification

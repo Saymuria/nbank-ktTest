@@ -1,4 +1,4 @@
-package generators
+package framework.generators
 
 import models.BaseModel
 import kotlin.reflect.KClass

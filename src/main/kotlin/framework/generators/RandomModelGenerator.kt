@@ -1,4 +1,4 @@
-package generators
+package framework.generators
 
 import com.github.curiousoddman.rgxgen.RgxGen
 import java.time.LocalDate
