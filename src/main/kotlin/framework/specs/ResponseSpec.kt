@@ -25,10 +25,16 @@ class ResponseSpec {
                 .build()
         }
 
-        fun requestReturnsBadRequest(errorKey: String, errorValue: String): ResponseSpecification {
+        fun requestReturnsBadRequestWithError(errorKey: String, errorValue: String): ResponseSpecification {
             return defaultResponseBuilder()
                 .expectStatusCode(SC_BAD_REQUEST)
                 .expectBody(errorKey, Matchers.equalTo(errorValue))
+                .build()
+        }
+
+        fun requestReturnsBadRequest(): ResponseSpecification {
+            return defaultResponseBuilder()
+                .expectStatusCode(SC_BAD_REQUEST)
                 .build()
         }
     }

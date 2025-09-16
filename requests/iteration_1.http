@@ -7,9 +7,10 @@ POST http://localhost:4111/api/v1/auth/login
 Content-Type: application/json
 
 {
-  "username": "wLlMdE",
+  "username": "tYNqsh",
   "password": "verysTRongPassword33$"
 }
+
 
 ###Positive case: Admin can create user with valid data
 POST http://localhost:4111/api/v1/admin/users
@@ -191,9 +192,23 @@ Authorization: Basic YWRtaW46YWRtaW4=
 ###Positive case: Authorized user can create account
 POST http://localhost:4111/api/v1/accounts
 Content-Type: application/json
-Authorization: Basic d0xsTWRFOnZlcnlzVFJvbmdQYXNzd29yZDMzJA==
+Authorization: Basic dFlOcXNoOnZlcnlzVFJvbmdQYXNzd29yZDMzJA==
 
 ###Check user account creation
 GET http://localhost:4111/api/v1/customer/accounts
 Content-Type: application/json
-Authorization: Basic d0xsTWRFOnZlcnlzVFJvbmdQYXNzd29yZDMzJA==
+Authorization: Basic dFlOcXNoOnZlcnlzVFJvbmdQYXNzd29yZDMzJA==
+
+###Check customer account
+GET http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic dFlOcXNoOnZlcnlzVFJvbmdQYXNzd29yZDMzJA==
+
+###Update customer account
+PUT http://localhost:4111/api/v1/customer/profile
+Content-Type: application/json
+Authorization: Basic dFlOcXNoOnZlcnlzVFJvbmdQYXNzd29yZDMzJA==
+
+{
+  "name": "New Name 111 (ХЪЪ"
+}

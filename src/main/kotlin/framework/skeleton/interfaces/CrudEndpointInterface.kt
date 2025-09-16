@@ -6,7 +6,7 @@ import models.BaseModel
 //Crud-create,read,update,delete или post,get,put,delete
 interface CrudEndpointInterface {
     fun post(model: BaseModel?): Any
-    fun get(id: Long): Any
-    fun update(id: Long, model: BaseModel): Any
-    fun delete(id: Long) : Any
+    fun get(id: Long?): Any
+    fun update(id: Long?, model: BaseModel?): Any
+    fun delete(id: Long?) : Any
 }

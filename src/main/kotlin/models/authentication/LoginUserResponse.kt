@@ -1,4 +1,6 @@
-package models
+package models.authentication
+
+import models.BaseModel
 
 data class LoginUserResponse (
     val role: String,

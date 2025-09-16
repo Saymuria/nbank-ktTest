@@ -22,17 +22,22 @@ class ValidatedCrudRequester<T : BaseModel>(
     }
 
 
-
-    override fun get(id: Long): T {
-        TODO("Not yet implemented")
+    override fun get(id: Long?): T {
+        return crudRequester.get(id)
+            .extract()
+            .`as`(endpoint.responseModel.java) as T
     }
 
-    override fun update(id: Long, model: BaseModel): T {
-        TODO("Not yet implemented")
+    override fun update(id: Long?, model: BaseModel?): T {
+        return crudRequester.update(id, model)
+            .extract()
+            .`as`(endpoint.responseModel.java) as T
     }
 
-    override fun delete(id: Long) {
-        TODO("Not yet implemented")
+    override fun delete(id: Long?): T {
+        return crudRequester.delete(id)
+            .extract()
+            .`as`(endpoint.responseModel.java) as T
     }
 
 }

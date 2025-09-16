@@ -15,7 +15,6 @@ class ComparisonConfigParser {
     private fun loadConfigurations() {
         val inputStream = javaClass.classLoader.getResourceAsStream(CONFIG_FILE)
             ?: return // Если файла нет - просто выходим, configs останется пустым
-
         inputStream.bufferedReader().useLines { lines ->
             lines.forEach { line ->
                 if (line.isNotBlank() && !line.startsWith("#")) {
@@ -60,5 +59,4 @@ class ComparisonConfigParser {
                         "Add mapping to $CONFIG_FILE"
             )
     }
-
 }

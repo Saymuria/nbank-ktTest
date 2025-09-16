@@ -35,7 +35,6 @@ configurations.all {
             "com.fasterxml.jackson.core:jackson-annotations:2.15.3"
         )
 
-
         failOnVersionConflict()
     }
 }
@@ -55,14 +54,12 @@ dependencies {
     implementation("io.rest-assured:rest-assured:5.4.0")
     implementation("io.rest-assured:kotlin-extensions:5.4.0")
 
-    //Либа для генерации значений по regexp-паттернам
-
-    implementation("com.github.curious-odd-man:rgxgen:1.0")
+    //asserts
+    implementation("org.assertj:assertj-core:3.24.2")
 
     // Тестирование
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.3")
-    testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation(kotlin("test"))
 }
 

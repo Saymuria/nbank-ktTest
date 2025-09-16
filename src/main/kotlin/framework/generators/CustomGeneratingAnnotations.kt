@@ -1,25 +1,28 @@
 package framework.generators
 
-
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class GeneratingRule(val pattern: String)
 
-// Email.kt
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Email(val format: String)
-
-// PhoneNumber.kt
-@Target(AnnotationTarget.FIELD)
-@Retention(AnnotationRetention.RUNTIME)
-annotation class RusPhoneNumber()
+annotation class Password()
 
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class DateValue(val format: String)
+annotation class FixedValues(val value: String)
 
-// Для работы с фикисрованными значениями/типизированными полями
 @Target(AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class FixedValue(val value: String)
+annotation class Username()
+
+@Target(AnnotationTarget.FIELD)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class BigDecimalRange(
+    val min: Double,
+    val max: Double,
+)
+//в случае необходимости можно будет добавить еще аннотации, например, email, phone
+@Target(AnnotationTarget.FIELD)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class Email()

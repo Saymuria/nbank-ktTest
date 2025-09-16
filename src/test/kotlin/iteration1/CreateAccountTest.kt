@@ -1,49 +1,42 @@
 package iteration1
 
-import framework.generators.RandomData
-import io.restassured.RestAssured.given
-import io.restassured.http.ContentType
-import models.CreateUserRequest
-import models.LoginUserRequest
-import org.apache.http.HttpHeaders.AUTHORIZATION
-import org.apache.http.HttpStatus.SC_OK
+import BaseTest
+import framework.extentions.shouldMatchResponse
+import framework.skeleton.Endpoint.CREATE_ACCOUNT
+import framework.skeleton.Endpoint.GET_CUSTOMER_ACCOUNTS
+import framework.skeleton.requesters.ValidatedCrudRequester
+import framework.specs.RequestSpecs.Companion.authAsUser
+import framework.specs.ResponseSpec.Companion.entityWasCreated
+import framework.specs.ResponseSpec.Companion.requestReturnOk
+import framework.utils.generate
+import models.accounts.createAccount.CreateAccountResponse
+import models.admin.createUser.CreateUserRequest
+import models.customer.GetCustomerAccountsResponse
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import framework.skeleton.Endpoint
-import framework.skeleton.requesters.CrudRequester
-import framework.specs.RequestSpecs
-import framework.specs.ResponseSpec
+import steps.AdminSteps
 
-class CreateAccountTest {
+@DisplayName("Check user account creation")
+class CreateAccountTest : BaseTest() {
+    private val adminSteps = AdminSteps()
 
     @Test
+    @DisplayName("Positive test: user can create account")
     fun userCanAccountTest() {
-        val userRequest = CreateUserRequest(
-            username = RandomData.getUserName(),
-            password = RandomData.getUserPassword(),
-            role = "USER"
-        )
-        val userAuthToken = LoginUserRequest(username = userRequest.username, password = userRequest.password)
-        //создание пользователя
-        CrudRequester(RequestSpecs.adminAuthSpec(), ResponseSpec.entityWasCreated(), Endpoint.ADMIN_USER).post(
-            userRequest
-        )
-        //получение авторизации
-        val userAuthHeader =
-            CrudRequester(RequestSpecs.unAuthSpec(), ResponseSpec.requestReturnOk(), Endpoint.LOGIN).post(userAuthToken)
-                .extract().header(AUTHORIZATION)
-
-        CrudRequester(
-            RequestSpecs.authAsUser(userRequest.username, userRequest.password),
-            ResponseSpec.entityWasCreated(), Endpoint.ACCOUNTS
+        //createUser
+        val createUserRequest = generate<CreateUserRequest>()
+        adminSteps.createUser(createUserRequest)
+        //create account
+        val createAccountResponse = ValidatedCrudRequester<CreateAccountResponse>(
+            authAsUser(createUserRequest.username, createUserRequest.password),
+            entityWasCreated(), CREATE_ACCOUNT
         ).post(null)
         //check account creation
-        given()
-            .contentType(ContentType.JSON)
-            .accept(ContentType.JSON)
-            .header(AUTHORIZATION, userAuthHeader)
-            .get("http://localhost:4111/api/v1/customer/accounts")
-            .then()
-            .assertThat()
-            .statusCode(SC_OK)
+        val getAccountResponse = ValidatedCrudRequester<GetCustomerAccountsResponse>(
+            authAsUser(createUserRequest.username, createUserRequest.password),
+            requestReturnOk(),
+            GET_CUSTOMER_ACCOUNTS
+        ).get(null)
+        createAccountResponse.shouldMatchResponse(getAccountResponse)
     }
 }

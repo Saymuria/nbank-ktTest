@@ -1,38 +1,47 @@
 package iteration1
 
-import framework.generators.RandomData.Companion.getUserName
-import framework.generators.RandomData.Companion.getUserPassword
-import models.CreateUserRequest
-import models.CreateUserResponse
-import models.LoginUserRequest
-import models.LoginUserResponse
-import entities.UserRole
-import org.apache.http.HttpHeaders.AUTHORIZATION
-import org.hamcrest.Matchers.notNullValue
-import org.junit.jupiter.api.Test
-import framework.skeleton.Endpoint
+import BaseTest
+import framework.extentions.shouldMatchResponse
+import framework.skeleton.Endpoint.LOGIN
 import framework.skeleton.requesters.CrudRequester
 import framework.skeleton.requesters.ValidatedCrudRequester
-import framework.specs.RequestSpecs
-import framework.specs.ResponseSpec
+import framework.specs.RequestSpecs.Companion.unAuthSpec
+import framework.specs.ResponseSpec.Companion.requestReturnOk
+import framework.utils.generate
+import models.admin.createUser.CreateUserRequest
+import models.authentication.LoginUserRequest
+import models.authentication.LoginUserResponse
+import org.apache.http.HttpHeaders.AUTHORIZATION
+import org.hamcrest.Matchers.notNullValue
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
+import steps.AdminSteps
 
-class LoginUserTest : BaseTest(){
+@DisplayName("Check user login creation")
+class LoginUserTest : BaseTest() {
+    private val adminSteps = AdminSteps()
 
-    //Название теста должно совпадать с требованием, которое он проверяет
     @Test
+    @DisplayName("Admin user can login")
     fun adminCanGenerateAuthTokenTest() {
-        val userRequest = LoginUserRequest("admin", "admin")
-        ValidatedCrudRequester<LoginUserResponse>(RequestSpecs.unAuthSpec(), ResponseSpec.requestReturnOk(), Endpoint.LOGIN).post(userRequest)
+        val adminLoginRequest = LoginUserRequest("admin", "admin")
+        val adminLoginResponse = ValidatedCrudRequester<LoginUserResponse>(
+            unAuthSpec(),
+            requestReturnOk(),
+            LOGIN
+        ).post(adminLoginRequest)
+        adminLoginRequest.shouldMatchResponse(adminLoginResponse)
     }
 
     @Test
+    @DisplayName("User can login")
     fun userCanGenerateAuthTokenTest() {
-        val userData = CreateUserRequest(getUserName(), getUserPassword(), UserRole.USER.toString())
+        val createUserRequest = generate<CreateUserRequest>()
         //создание пользователя
-        ValidatedCrudRequester<CreateUserResponse>(RequestSpecs.adminAuthSpec(), ResponseSpec.entityWasCreated(), Endpoint.ADMIN_USER).post(userData)
+        adminSteps.createUser(createUserRequest)
         //получение авторизации
-        CrudRequester(RequestSpecs.unAuthSpec(), ResponseSpec.requestReturnOk(), Endpoint.LOGIN).post(userData)
-            .assertThat()
+        val userLoginRequest = LoginUserRequest(createUserRequest.username, createUserRequest.password)
+        CrudRequester(unAuthSpec(), requestReturnOk(), LOGIN).post(userLoginRequest).assertThat()
             .header(AUTHORIZATION, notNullValue())
     }
 }
