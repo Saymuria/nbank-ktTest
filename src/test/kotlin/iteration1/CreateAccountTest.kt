@@ -1,87 +1,42 @@
 package iteration1
 
-import io.restassured.RestAssured
-import io.restassured.RestAssured.given
-import io.restassured.filter.log.RequestLoggingFilter
-import io.restassured.filter.log.ResponseLoggingFilter
-import io.restassured.http.ContentType
-import org.apache.http.HttpHeaders.AUTHORIZATION
-import org.apache.http.HttpStatus.SC_CREATED
-import org.apache.http.HttpStatus.SC_OK
-import org.junit.jupiter.api.BeforeAll
+import BaseTest
+import framework.extentions.shouldMatchResponse
+import framework.skeleton.Endpoint.CREATE_ACCOUNT
+import framework.skeleton.Endpoint.GET_CUSTOMER_ACCOUNTS
+import framework.skeleton.requesters.ValidatedCrudRequester
+import framework.specs.RequestSpecs.Companion.authAsUser
+import framework.specs.ResponseSpec.Companion.entityWasCreated
+import framework.specs.ResponseSpec.Companion.requestReturnOk
+import framework.utils.generate
+import models.accounts.createAccount.CreateAccountResponse
+import models.admin.createUser.CreateUserRequest
+import models.customer.GetCustomerAccountsResponse
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import steps.AdminSteps
 
-class CreateAccountTest {
-
-    companion object {
-        @JvmStatic
-        @BeforeAll
-        fun setupRestAssured() {
-            RestAssured.filters(
-                listOf(
-                    RequestLoggingFilter(), ResponseLoggingFilter()
-                )
-            )
-        }
-    }
+@DisplayName("Check user account creation")
+class CreateAccountTest : BaseTest() {
+    private val adminSteps = AdminSteps()
 
     @Test
-    fun userCanGenerateAuthTokenTest() {
-        //создание пользователя
-        given()
-            .contentType(ContentType.JSON)
-            .accept(ContentType.JSON)
-            .header(AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
-            .body(
-                """
-                    {
-                        "username": "sasha1393123q23",
-                        "password": "verysTRongPassword33$",
-                        "role": "USER"
-                    }"""
-            )
-            .post("http://localhost:4111/api/v1/admin/users")
-            .then()
-            .assertThat()
-            .statusCode(SC_CREATED)
-
-        //получение авторизации
-        val userAuthHeader = given()
-            .contentType(ContentType.JSON)
-            .accept(ContentType.JSON)
-            .body(
-                """
-                    {
-                    "username": "sasha1393123q23", 
-                    "password": "verysTRongPassword33$"
-                    }
-                """
-            )
-            .post("http://localhost:4111/api/v1/auth/login")
-            .then()
-            .assertThat()
-            .statusCode(SC_OK)
-            .extract()
-            .header(AUTHORIZATION)
-
-        //создаение счета пользователя
-        given()
-            .contentType(ContentType.JSON)
-            .accept(ContentType.JSON)
-            .header(AUTHORIZATION, userAuthHeader)
-            .post("http://localhost:4111/api/v1/accounts")
-            .then()
-            .assertThat()
-            .statusCode(SC_CREATED)
-
+    @DisplayName("Positive test: user can create account")
+    fun userCanAccountTest() {
+        //createUser
+        val createUserRequest = generate<CreateUserRequest>()
+        adminSteps.createUser(createUserRequest)
+        //create account
+        val createAccountResponse = ValidatedCrudRequester<CreateAccountResponse>(
+            authAsUser(createUserRequest.username, createUserRequest.password),
+            entityWasCreated(), CREATE_ACCOUNT
+        ).post(null)
         //check account creation
-        given()
-            .contentType(ContentType.JSON)
-            .accept(ContentType.JSON)
-            .header(AUTHORIZATION, userAuthHeader)
-            .get("http://localhost:4111/api/v1/customer/accounts")
-            .then()
-            .assertThat()
-            .statusCode(SC_OK)
+        val getAccountResponse = ValidatedCrudRequester<GetCustomerAccountsResponse>(
+            authAsUser(createUserRequest.username, createUserRequest.password),
+            requestReturnOk(),
+            GET_CUSTOMER_ACCOUNTS
+        ).get(null)
+        createAccountResponse.shouldMatchResponse(getAccountResponse)
     }
 }

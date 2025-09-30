@@ -1,0 +1,25 @@
+### User can make transfer
+### User token Authorization: Basic dFlOcXNoOnZlcnlzVFJvbmdQYXNzd29yZDMzJA==
+POST http://localhost:4111/api/v1/accounts/transfer
+Content-Type: application/json
+Authorization: Basic dFlOcXNoOnZlcnlzVFJvbmdQYXNzd29yZDMzJA==
+
+{
+  "senderAccountId": 7,
+  "receiverAccountId": 20,
+  "amount": 6000.00
+}
+
+### User can make deposit
+POST http://localhost:4111/api/v1/accounts/deposit
+Content-Type: application/json
+Authorization: Basic VDNubVRVb0d6VkxzaG5xOnZhWjYjTjB2OA==
+
+{
+  "id": 20,
+  "balance": 0.00
+}
+
+### User's transactions
+GET http://localhost:4111/api/v1/accounts/7/transactions
+Authorization: Basic dFlOcXNoOnZlcnlzVFJvbmdQYXNzd29yZDMzJA==

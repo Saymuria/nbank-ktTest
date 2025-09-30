@@ -1,88 +1,47 @@
 package iteration1
 
-import io.restassured.RestAssured
-import io.restassured.RestAssured.given
-import io.restassured.filter.log.RequestLoggingFilter
-import io.restassured.filter.log.ResponseLoggingFilter
-import io.restassured.http.ContentType
+import BaseTest
+import framework.extentions.shouldMatchResponse
+import framework.skeleton.Endpoint.LOGIN
+import framework.skeleton.requesters.CrudRequester
+import framework.skeleton.requesters.ValidatedCrudRequester
+import framework.specs.RequestSpecs.Companion.unAuthSpec
+import framework.specs.ResponseSpec.Companion.requestReturnOk
+import framework.utils.generate
+import models.admin.createUser.CreateUserRequest
+import models.authentication.LoginUserRequest
+import models.authentication.LoginUserResponse
 import org.apache.http.HttpHeaders.AUTHORIZATION
-import org.apache.http.HttpStatus.SC_CREATED
-import org.apache.http.HttpStatus.SC_OK
-import org.hamcrest.Matchers
-import org.junit.jupiter.api.BeforeAll
+import org.hamcrest.Matchers.notNullValue
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import steps.AdminSteps
 
-class LoginUserTest {
+@DisplayName("Check user login creation")
+class LoginUserTest : BaseTest() {
+    private val adminSteps = AdminSteps()
 
-    companion object {
-        @JvmStatic
-        @BeforeAll
-        fun setupRestAssured() {
-            RestAssured.filters(
-                listOf(
-                    RequestLoggingFilter(), ResponseLoggingFilter()
-                )
-            )
-        }
-    }
-
-    //Название теста должно совпадать с требованием, которое он проверяет
     @Test
+    @DisplayName("Admin user can login")
     fun adminCanGenerateAuthTokenTest() {
-        given()
-            .contentType(ContentType.JSON)
-            .accept(ContentType.JSON)
-            .body(
-                """
-                    {
-                    "username": "admin",
-                    "password": "admin"
-                    }
-                """
-            )
-            .post("http://localhost:4111/api/v1/auth/login")
-            .then()
-            .assertThat()
-            .statusCode(SC_OK)
-            .header("Authorization", "Basic YWRtaW46YWRtaW4=")
+        val adminLoginRequest = LoginUserRequest("admin", "admin")
+        val adminLoginResponse = ValidatedCrudRequester<LoginUserResponse>(
+            unAuthSpec(),
+            requestReturnOk(),
+            LOGIN
+        ).post(adminLoginRequest)
+        adminLoginRequest.shouldMatchResponse(adminLoginResponse)
     }
 
     @Test
+    @DisplayName("User can login")
     fun userCanGenerateAuthTokenTest() {
+        val createUserRequest = generate<CreateUserRequest>()
         //создание пользователя
-        given()
-            .contentType(ContentType.JSON)
-            .accept(ContentType.JSON)
-            .header(AUTHORIZATION, "Basic YWRtaW46YWRtaW4=")
-            .body(
-                """
-                    {
-                        "username": "sasha1393123",
-                        "password": "verysTRongPassword33$",
-                        "role": "USER"
-                    }"""
-            )
-            .post("http://localhost:4111/api/v1/admin/users")
-            .then()
-            .assertThat()
-            .statusCode(SC_CREATED)
-
+        adminSteps.createUser(createUserRequest)
         //получение авторизации
-        given()
-            .contentType(ContentType.JSON)
-            .accept(ContentType.JSON)
-            .body(
-                """
-                    {
-                    "username": "sasha1393123", 
-                    "password": "verysTRongPassword33$"
-                    }
-                """
-            )
-            .post("http://localhost:4111/api/v1/auth/login")
-            .then()
-            .assertThat()
-            .statusCode(SC_OK)
-            .header("Authorization", Matchers.notNullValue())
+        val userLoginRequest = LoginUserRequest(createUserRequest.username, createUserRequest.password)
+        CrudRequester(unAuthSpec(), requestReturnOk(), LOGIN).post(userLoginRequest).assertThat()
+            .header(AUTHORIZATION, notNullValue())
     }
 }
