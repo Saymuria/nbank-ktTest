@@ -71,12 +71,10 @@ class CreateUserTest : BaseTest() {
             method = POST
         )
         createUserRequest shouldMatchResponse createUserResponse
-
-        val allUsers = GET_ALL_USER.validatedRequest<GetAllUserResponse>(
+        GET_ALL_USER.validatedRequest<GetAllUserResponse>(
             auth = { adminAuthSpec() },
             method = GET
         )
-        //проверка
     }
 
     @ParameterizedTest
