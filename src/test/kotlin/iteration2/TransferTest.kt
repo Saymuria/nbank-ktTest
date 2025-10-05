@@ -1,36 +1,34 @@
 package iteration2
 
 import BaseTest
-import framework.extentions.shouldMatchResponse
+import dsl.createUserWithAccount
+import dsl.deposit
+import dsl.transfer
+import dsl.check
+import dsl.request
+import dsl.validatedRequest
 import framework.skeleton.Endpoint
+import framework.skeleton.Endpoint.GET_CUSTOMER_PROFILE
 import framework.skeleton.Endpoint.TRANSFER_MONEY
-import framework.skeleton.requesters.CrudRequester
-import framework.skeleton.requesters.ValidatedCrudRequester
 import framework.specs.RequestSpecs.Companion.authAsUser
-import framework.specs.ResponseSpec
-import framework.specs.ResponseSpec.Companion.requestReturnOk
 import framework.specs.ResponseSpec.Companion.requestReturnsBadRequest
 import framework.utils.generate
-import models.accounts.createAccount.CreateAccountResponse
+import io.restassured.http.Method.GET
+import io.restassured.http.Method.POST
 import models.accounts.deposit.DepositMoneyRequest
 import models.accounts.transfer.TransferMoneyRequest
-import models.accounts.transfer.TransferMoneyResponse
-import models.admin.createUser.CreateUserRequest
+import models.customer.GetCustomerProfileResponse
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
-import steps.AdminSteps
-import steps.UserSteps
 import java.math.BigDecimal
 import java.util.stream.Stream
 
 @DisplayName("User can transfer money")
-class TransferTest :BaseTest() {
-    private val adminSteps = AdminSteps()
-    private val userSteps = UserSteps()
+class TransferTest : BaseTest() {
 
     companion object {
         @JvmStatic
@@ -48,83 +46,87 @@ class TransferTest :BaseTest() {
     @Test
     @DisplayName("User can make transfer through his accounts all sum")
     fun transferAllDepositTroughAccounts() {
-        val createUserRequest = generate<CreateUserRequest>()
-        adminSteps.createUser(createUserRequest)
-        val senderAccountId = userSteps.createAccount(createUserRequest.username, createUserRequest.password).id
-        val depositMoneyRequest = generate<DepositMoneyRequest>(mapOf("id" to senderAccountId))
-        userSteps.makeDeposit(createUserRequest.username, createUserRequest.password, depositMoneyRequest)
-        val receiverAccountId = userSteps.createAccount(createUserRequest.username, createUserRequest.password).id
-        val transferMoneyRequest = TransferMoneyRequest(senderAccountId, receiverAccountId, depositMoneyRequest.balance)
-        CrudRequester(
-            authAsUser(createUserRequest.username, createUserRequest.password),
-            requestReturnOk(),
-            TRANSFER_MONEY
-        ).post(transferMoneyRequest)
+        val (sender, senderAccount) = createUserWithAccount()
+        val (receiver, receiverAccount) = createUserWithAccount()
+        val depositMoneyRequest = generate<DepositMoneyRequest>(mapOf("id" to senderAccount.id))
+        sender.deposit(depositMoneyRequest)
+        val transferMoneyRequest =
+            TransferMoneyRequest(senderAccount.id, receiverAccount.id, depositMoneyRequest.balance)
+        val transferMoneyResponse = sender.transfer(transferMoneyRequest)
+        val receiverBalance = GET_CUSTOMER_PROFILE.validatedRequest<GetCustomerProfileResponse>(
+            auth = { authAsUser(receiver.username, receiver.originalPassword) },
+            method = GET
+        ).accounts.first().balance
+        check(softly) {
+            transferMoneyResponse.message shouldBe "Transfer successful"
+            transferMoneyResponse.amount shouldBe receiverBalance
+        }
     }
 
     @Test
     @DisplayName("User can make transfer to other user's account")
     fun transferMoney() {
-        val createSender = generate<CreateUserRequest>()
-        adminSteps.createUser(createSender)
-        val senderAccountId = userSteps.createAccount(createSender.username, createSender.password).id
-        val deposit = BigDecimal("300.00")
-        val depositMoneyRequest = DepositMoneyRequest(senderAccountId, deposit)
-        userSteps.makeDeposit(createSender.username, createSender.password, depositMoneyRequest)
+        val (sender, senderAccount) = createUserWithAccount()
+        val validDepositSum = BigDecimal("300.00")
+        sender.deposit(DepositMoneyRequest(senderAccount.id, validDepositSum))
 
-        val createReceiver = generate<CreateUserRequest>()
-        adminSteps.createUser(createReceiver)
+        val (receiver, receiverAccount) = createUserWithAccount()
 
-        val receiverAccountId = userSteps.createAccount(createReceiver.username, createReceiver.password).id
         val transfer = BigDecimal("50.00")
-        val transferMoneyRequest = TransferMoneyRequest(senderAccountId, receiverAccountId, transfer)
-        val transferMoneyResponse = ValidatedCrudRequester<TransferMoneyResponse>(
-            authAsUser(createSender.username, createSender.password),
-            requestReturnOk(),
-            TRANSFER_MONEY
-        ).post(transferMoneyRequest)
-        softly.assertThat(transferMoneyResponse.message).isEqualTo("Transfer successful")
-        transferMoneyRequest.shouldMatchResponse(softly, transferMoneyResponse)
+        val transferMoneyRequest = TransferMoneyRequest(senderAccount.id, receiverAccount.id, transfer)
+
+        val transferMoneyResponse = sender.transfer(transferMoneyRequest)
+        val receiverBalance = GET_CUSTOMER_PROFILE.validatedRequest<GetCustomerProfileResponse>(
+            auth = { authAsUser(receiver.username, receiver.originalPassword) },
+            method = GET
+        ).accounts.first().balance
+        check(softly) {
+            transferMoneyResponse.message shouldBe "Transfer successful"
+            transferMoneyResponse.amount shouldBe receiverBalance
+            transferMoneyRequest shouldMatch transferMoneyResponse
+        }
     }
 
     @ParameterizedTest
     @ValueSource(strings = ["1.00", "5000.00"])
-    @DisplayName("User can make transfer to bank account")
+    @DisplayName("User can make transfer with edge amount")
     fun makeTransferEdgeCheck(transferSum: String) {
-        val createUserRequest = generate<CreateUserRequest>()
-        adminSteps.createUser(createUserRequest)
-        val senderAccountId = userSteps.createAccount(createUserRequest.username, createUserRequest.password).id
-        val depositMoneyRequest = DepositMoneyRequest(senderAccountId, BigDecimal("5500.00"))
-        userSteps.makeDeposit(createUserRequest.username, createUserRequest.password, depositMoneyRequest)
-        val receiverAccountId = userSteps.createAccount(createUserRequest.username, createUserRequest.password).id
-        val transferMoneyRequest = TransferMoneyRequest(senderAccountId, receiverAccountId, BigDecimal(transferSum))
-        CrudRequester(
-            authAsUser(createUserRequest.username, createUserRequest.password),
-            requestReturnOk(),
-            TRANSFER_MONEY
-        ).post(transferMoneyRequest)
+        val (sender, senderAccount) = createUserWithAccount()
+        val validDepositSum = BigDecimal("5500.00")
+        sender.deposit(DepositMoneyRequest(senderAccount.id, validDepositSum))
+        val (receiver, receiverAccount) = createUserWithAccount()
+
+        val transferMoneyRequest = TransferMoneyRequest(senderAccount.id, receiverAccount.id, BigDecimal(transferSum))
+        val transferMoneyResponse = sender.transfer(transferMoneyRequest)
+        check(softly) {
+            transferMoneyResponse.message shouldBe "Transfer successful"
+            transferMoneyRequest shouldMatch transferMoneyResponse
+        }
     }
 
     @ParameterizedTest
     @MethodSource("invalidTransferSum")
-    @DisplayName("User cannot make deposit to bank account")
+    @DisplayName("User cannot make transfer with invalid sum")
     fun depositWithInvalidDepositSum(
-        transferSum: BigDecimal
+        invalidTransferSum: BigDecimal
     ) {
-        val createUserRequest = generate<CreateUserRequest>()
-        adminSteps.createUser(createUserRequest)
-        val senderAccountId = userSteps.createAccount(createUserRequest.username, createUserRequest.password).id
-        val depositMoneyRequest = DepositMoneyRequest(senderAccountId, BigDecimal("10000.00"))
-        userSteps.makeDeposit(createUserRequest.username, createUserRequest.password, depositMoneyRequest)
-        val receiverAccountId = ValidatedCrudRequester<CreateAccountResponse>(
-            authAsUser(createUserRequest.username, createUserRequest.password),
-            ResponseSpec.entityWasCreated(), Endpoint.CREATE_ACCOUNT
-        ).post(null).id
-        val transferMoneyRequest = TransferMoneyRequest(senderAccountId, receiverAccountId, transferSum)
-        CrudRequester(
-            authAsUser(createUserRequest.username, createUserRequest.password),
-            requestReturnsBadRequest(),
-            TRANSFER_MONEY
-        ).post(transferMoneyRequest)
+        val (sender, senderAccount) = createUserWithAccount()
+        val validDepositSum = BigDecimal("10000.00")
+        sender.deposit(DepositMoneyRequest(senderAccount.id, validDepositSum))
+        val (receiver, receiverAccount) = createUserWithAccount()
+        val transferMoneyRequest = TransferMoneyRequest(senderAccount.id, receiverAccount.id, invalidTransferSum)
+        TRANSFER_MONEY.request(
+            auth = { authAsUser(sender.username, sender.originalPassword) },
+            response = { requestReturnsBadRequest() },
+            requestBody = transferMoneyRequest,
+            method = POST
+        )
+        val senderBalance = GET_CUSTOMER_PROFILE.validatedRequest<GetCustomerProfileResponse>(
+            auth = { authAsUser(sender.username, sender.originalPassword) },
+            method = GET
+        ).accounts.first().balance
+        check(softly) {
+            senderBalance shouldNotBe validDepositSum
+        }
     }
 }
