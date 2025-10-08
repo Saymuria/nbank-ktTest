@@ -1,6 +1,6 @@
-package iteration1
+package apiTest.iteration1
 
-import BaseTest
+import apiTest.BaseTest
 import dsl.request
 import dsl.validatedRequest
 import entities.UserRole

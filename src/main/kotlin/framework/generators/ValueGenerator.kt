@@ -171,7 +171,7 @@ class ValueGenerator {
         }
     }
 
-    private fun generateAlphabeticString(minLength: Int, maxLength: Int): String {
+    fun generateAlphabeticString(minLength: Int, maxLength: Int): String {
         val length = random.nextInt(maxLength - minLength + 1) + minLength
         val pool = alphaLowerPool + alphaUpperPool
         return buildString {

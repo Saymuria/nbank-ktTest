@@ -1,6 +1,6 @@
-package iteration1
+package apiTest.iteration1
 
-import BaseTest
+import apiTest.BaseTest
 import dsl.createUser
 import dsl.validatedRequest
 import framework.extentions.shouldMatchResponse
@@ -8,7 +8,6 @@ import framework.skeleton.Endpoint.CREATE_ACCOUNT
 import framework.skeleton.Endpoint.GET_CUSTOMER_ACCOUNTS
 import framework.specs.RequestSpecs.Companion.authAsUser
 import framework.specs.ResponseSpec.Companion.entityWasCreated
-import io.restassured.http.Method
 import io.restassured.http.Method.GET
 import io.restassured.http.Method.POST
 import models.accounts.createAccount.CreateAccountResponse

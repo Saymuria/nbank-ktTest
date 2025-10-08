@@ -1,15 +1,13 @@
-package iteration1
+package apiTest.iteration1
 
-import BaseTest
+import apiTest.BaseTest
 import dsl.createUser
-import dsl.request
 import dsl.validatedRequest
 import framework.extentions.shouldMatchResponse
 import framework.skeleton.Endpoint.LOGIN
 import framework.skeleton.requesters.CrudRequester
 import framework.specs.RequestSpecs.Companion.unAuthSpec
 import framework.specs.ResponseSpec.Companion.requestReturnOk
-import io.restassured.http.Method
 import io.restassured.http.Method.POST
 import models.authentication.LoginUserRequest
 import models.authentication.LoginUserResponse

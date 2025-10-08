@@ -1,11 +1,7 @@
-package iteration2
+package apiTest.iteration2
 
-import BaseTest
-import dsl.createUserWithAccount
-import dsl.updateProfileName
-import dsl.validatedRequest
-import dsl.check
-import dsl.request
+import apiTest.BaseTest
+import dsl.*
 import framework.extentions.shouldMatchResponse
 import framework.skeleton.Endpoint.GET_CUSTOMER_PROFILE
 import framework.skeleton.Endpoint.UPDATE_CUSTOMER_PROFILE
