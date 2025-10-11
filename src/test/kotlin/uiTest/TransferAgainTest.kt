@@ -1,18 +1,12 @@
 package uiTest
 
-import apiTest.iteration2.TransactionHistoryTest
 import com.codeborne.selenide.Condition
 import com.codeborne.selenide.Configuration
 import com.codeborne.selenide.Selectors
 import com.codeborne.selenide.Selenide
-import com.codeborne.selenide.Selenide.`$`
-import com.codeborne.selenide.Selenide.executeJavaScript
-import com.codeborne.selenide.Selenide.switchTo
-import dsl.createUserWithAccount
-import dsl.deposit
-import dsl.transfer
-import dsl.updateProfileName
-import dsl.validatedRequest
+import com.codeborne.selenide.Selenide.*
+import dsl.*
+import framework.generators.ValueGenerator
 import framework.skeleton.Endpoint.GET_CUSTOMER_ACCOUNTS
 import framework.skeleton.Endpoint.LOGIN
 import framework.skeleton.requesters.CrudRequester
@@ -30,64 +24,37 @@ import org.apache.http.HttpHeaders.AUTHORIZATION
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import ui.pages.BankAlerts
+import ui.pages.TransferPage
 import java.math.BigDecimal
 
-class TransferAgainTest {
+class TransferAgainTest : BaseUiTest() {
     companion object {
-        @JvmStatic
-        @BeforeAll
-        fun setUpSelenoid() {
-            Configuration.remote = "http://localhost:4444/wd/hub"
-            Configuration.baseUrl = "http://192.168.0.5:3000"
-            Configuration.browser = "chrome"
-            Configuration.browserSize = "1920x1080"
-            Configuration.browserCapabilities.setCapability(
-                "selenoid:options", mapOf("enableVNC" to true, "enableLog" to true)
-            )
-        }
+        val valueGenerator = ValueGenerator()
     }
-
     @Test
     fun userCanMakeTransferWithValidSumTest() {
         val (senderUser, senderAccount) = createUserWithAccount()
         val (receiverUser, receiverAccount) = createUserWithAccount()
-        val name = receiverUser.updateProfileName(generate<UpdateCustomerProfileRequest>())
+        val name = receiverUser.updateProfileName(generate<UpdateCustomerProfileRequest>()).customer.name!!
         val depositSum = BigDecimal("500.0")
         senderUser.deposit(generate<DepositMoneyRequest>(mapOf("id" to senderAccount.id, "balance" to depositSum)))
         val transferOutAmount = BigDecimal("200.0")
         val transferMoneyOutRequest = TransferMoneyRequest(senderAccount.id, receiverAccount.id, transferOutAmount)
         val transferMoneyOutResponse = senderUser.transfer(transferMoneyOutRequest)
-        val userLoginRequest = LoginUserRequest(senderUser.username, senderUser.originalPassword)
-        val authHeader = CrudRequester(unAuthSpec(), requestReturnOk(), LOGIN).post(userLoginRequest).extract()
-            .header(AUTHORIZATION)
-        Selenide.open("/")
-        executeJavaScript<Any>("localStorage.setItem('authToken', arguments[0])", authHeader)
-        Selenide.open("/transfer")
-        `$`(Selectors.byText("🔄 Make a Transfer")).shouldBe(Condition.visible)
-        `$`(Selectors.byText("🔁 Transfer Again")).click()
-        `$`(Selectors.byText("Matching Transactions")).shouldBe(Condition.visible)
-        `$`(Selectors.byAttribute("placeholder", "Enter name to find transactions")).sendKeys(name.customer.name)
-        `$`(Selectors.byText("🔍 Search Transactions")).click()
-        val allTransactions = `$`(Selectors.byText("Matching Transactions")).parent().findAll("li")
-        allTransactions.find { it.`$`(Selectors.byText("TRANSFER_IN")).exists() }?.`$`(Selectors.byText("🔁 Repeat"))
+        senderUser.authorizeAsUser()
+        TransferPage().open().openTransferAgain().searchTransactions(name).getAllTransactions().find { it.`$`(Selectors.byText("TRANSFER_IN")).exists() }?.`$`(Selectors.byText("🔁 Repeat"))
             ?.click()
-        `$`(Selectors.byClassName("modal-title")).shouldHave(Condition.exactText("🔁 Repeat Transfer"))
-        `$`("select").click()
-        `$`("select").selectOptionContainingText(senderAccount.accountNumber)
-        `$`(Selectors.by("for", "confirmCheck")).shouldBe(Condition.exactText("Confirm details are correct"))
-        `$`(Selectors.byId("confirmCheck")).click()
-        `$`(Selectors.byText("🚀 Send Transfer")).click()
-        val alert = switchTo().alert()
-        assertThat(alert.text).contains("✅ Transfer of \$200 successful from Account ${senderAccount.id} to ${receiverAccount.id}!")
-        val receiverBalance = GET_CUSTOMER_ACCOUNTS.validatedRequest<GetCustomerAccountsResponse>(
-            auth = { authAsUser(receiverUser.username, receiverUser.originalPassword) },
-            method = GET
-        ).accounts.first { it.accountNumber == receiverAccount.accountNumber }.balance
+        TransferPage().makeTransferAgain(senderAccount.accountNumber)
+            .checkAlertMessageAndAccept(
+                BankAlerts.TRANSFER_AGAIN_SUCCESS.format(transferOutAmount, senderAccount.id, receiverAccount.id)
+            )
+        val receiverBalance =
+            receiverUser.getCustomerProfile().accounts.first { it.accountNumber == receiverAccount.accountNumber }.balance
+
         assertThat(receiverBalance).isEqualTo(transferOutAmount + transferOutAmount)
-        val senderBalance = GET_CUSTOMER_ACCOUNTS.validatedRequest<GetCustomerAccountsResponse>(
-            auth = { authAsUser(senderUser.username, senderUser.originalPassword) },
-            method = GET
-        ).accounts.first { it.accountNumber == senderAccount.accountNumber }.balance
+        val senderBalance =
+            senderUser.getCustomerProfile().accounts.first { it.accountNumber == senderAccount.accountNumber }.balance
         assertThat(senderBalance).isEqualTo(depositSum - transferOutAmount - transferOutAmount)
     }
 
@@ -95,7 +62,7 @@ class TransferAgainTest {
     fun userCanMakeSeeTransferOutTransactionsTest() {
         val (senderUser, senderAccount) = createUserWithAccount()
         val (receiverUser, receiverAccount) = createUserWithAccount()
-        val name = receiverUser.updateProfileName(generate<UpdateCustomerProfileRequest>())
+        val name = receiverUser.updateProfileName(generate<UpdateCustomerProfileRequest>()).customer.name!!
         val depositSum = BigDecimal("500.0")
         senderUser.deposit(generate<DepositMoneyRequest>(mapOf("id" to senderAccount.id, "balance" to depositSum)))
         val transferOutAmount = BigDecimal("200.0")
@@ -104,19 +71,10 @@ class TransferAgainTest {
         val transferMoneyInRequest = TransferMoneyRequest(receiverAccount.id, senderAccount.id, transferOutAmount)
         val transferMoneyInResponse = receiverUser.transfer(transferMoneyInRequest)
 
-        val userLoginRequest = LoginUserRequest(senderUser.username, senderUser.originalPassword)
-        val authHeader = CrudRequester(unAuthSpec(), requestReturnOk(), LOGIN).post(userLoginRequest).extract()
-            .header(AUTHORIZATION)
-        Selenide.open("/")
-        executeJavaScript<Any>("localStorage.setItem('authToken', arguments[0])", authHeader)
-        Selenide.open("/transfer")
-        `$`(Selectors.byText("🔄 Make a Transfer")).shouldBe(Condition.visible)
-        `$`(Selectors.byText("🔁 Transfer Again")).click()
-        `$`(Selectors.byText("Matching Transactions")).shouldBe(Condition.visible)
-        `$`(Selectors.byAttribute("placeholder", "Enter name to find transactions")).sendKeys(name.customer.name)
-        `$`(Selectors.byText("🔍 Search Transactions")).click()
-        val allTransactions = `$`(Selectors.byText("Matching Transactions")).parent().findAll("li")
+        senderUser.authorizeAsUser()
+        val allTransactions = TransferPage().open().openTransferAgain().searchTransactions(name).getAllTransactions()
         assertThat(allTransactions).hasSize(1)
+
         //- Проверяем, что данные по транзакции совпадают с теми, которые были в исходящей транзакции из предшагов(сумма и тип перевода)
     }
 
@@ -126,7 +84,7 @@ class TransferAgainTest {
         val (receiverUser1, receiverAccount1) = createUserWithAccount()
         val (receiverUser2, receiverAccount2) = createUserWithAccount()
 
-        val name = receiverUser1.updateProfileName(generate<UpdateCustomerProfileRequest>())
+        val name = receiverUser1.updateProfileName(generate<UpdateCustomerProfileRequest>()).customer.name!!
         val depositSum = BigDecimal("500.0")
         senderUser.deposit(generate<DepositMoneyRequest>(mapOf("id" to senderAccount.id, "balance" to depositSum)))
         val transferOutAmount = BigDecimal("200.0")
@@ -135,23 +93,13 @@ class TransferAgainTest {
         val transferMoneyOutRequest2 = TransferMoneyRequest(senderAccount.id, receiverAccount2.id, transferOutAmount)
         val transferMoneyOutResponse2 = senderUser.transfer(transferMoneyOutRequest)
 
-        val userLoginRequest = LoginUserRequest(senderUser.username, senderUser.originalPassword)
-        val authHeader = CrudRequester(unAuthSpec(), requestReturnOk(), LOGIN).post(userLoginRequest).extract()
-            .header(AUTHORIZATION)
-        Selenide.open("/")
-        executeJavaScript<Any>("localStorage.setItem('authToken', arguments[0])", authHeader)
-        Selenide.open("/transfer")
-        `$`(Selectors.byText("🔄 Make a Transfer")).shouldBe(Condition.visible)
-        `$`(Selectors.byText("🔁 Transfer Again")).click()
-        `$`(Selectors.byText("Matching Transactions")).shouldBe(Condition.visible)
-        `$`(Selectors.byAttribute("placeholder", "Enter name to find transactions")).sendKeys(name.customer.name)
-        `$`(Selectors.byText("🔍 Search Transactions")).click()
-        val allTransactions = `$`(Selectors.byText("Matching Transactions")).parent().findAll("li")
+        senderUser.authorizeAsUser()
+        val allTransactions = TransferPage().open().openTransferAgain().searchTransactions(name).getAllTransactions()
         assertThat(allTransactions).hasSize(1)
         //- Проверяем, что данные по транзакции совпадают с теми, которые были в исходящей транзакции из предшагов(сумма и тип перевода)
-        `$`(Selectors.byAttribute("placeholder", "Enter name to find transactions")).sendKeys(receiverUser2.username)
-        `$`(Selectors.byText("🔍 Search Transactions")).click()
-        val allTransactions2 = `$`(Selectors.byText("Matching Transactions")).parent().findAll("li")
+
+        val allTransactions2 = TransferPage().searchTransactions(receiverUser2.username)
+
         assertThat(allTransactions).hasSize(1)
         //    - Данные по транзакции совпадают с теми, которые были в исходящей транзакции из предшагов(сумма и тип перевода)
     }
@@ -166,39 +114,20 @@ class TransferAgainTest {
         val transferOutAmount = BigDecimal("200.0")
         val transferMoneyOutRequest = TransferMoneyRequest(senderAccount.id, receiverAccount.id, transferOutAmount)
         val transferMoneyOutResponse = senderUser.transfer(transferMoneyOutRequest)
-        val userLoginRequest = LoginUserRequest(senderUser.username, senderUser.originalPassword)
-        val authHeader = CrudRequester(unAuthSpec(), requestReturnOk(), LOGIN).post(userLoginRequest).extract()
-            .header(AUTHORIZATION)
-        Selenide.open("/")
-        executeJavaScript<Any>("localStorage.setItem('authToken', arguments[0])", authHeader)
-        Selenide.open("/transfer")
-        `$`(Selectors.byText("🔄 Make a Transfer")).shouldBe(Condition.visible)
-        `$`(Selectors.byText("🔁 Transfer Again")).click()
-        `$`(Selectors.byText("Matching Transactions")).shouldBe(Condition.visible)
-        `$`(Selectors.byAttribute("placeholder", "Enter name to find transactions")).sendKeys(name.customer.name)
-        `$`(Selectors.byText("🔍 Search Transactions")).click()
-        val alert = switchTo().alert()
-        assertThat(alert.text).isEqualTo("No matching users found.")
-        alert.accept()
-        val allTransactions2 = `$`(Selectors.byText("Matching Transactions")).parent().findAll("li")
-        assertThat(allTransactions2).hasSize(0)
+        senderUser.authorizeAsUser()
+        TransferPage().open().openTransferAgain().searchTransactions(valueGenerator.generateAlphabeticString(3,5)).checkAlertMessageAndAccept(
+            BankAlerts.NO_MATCHING_USER_FOUND.message
+        )
+        val allTransactions = TransferPage().getAllTransactions()
+        assertThat(allTransactions).hasSize(0)
     }
 
     @Test
     fun userCannotFindTransferOutWithoutAnyOperationsTest() {
         val (senderUser, senderAccount) = createUserWithAccount()
-        val (receiverUser, receiverAccount) = createUserWithAccount()
-        val userLoginRequest = LoginUserRequest(senderUser.username, senderUser.originalPassword)
-        val authHeader = CrudRequester(unAuthSpec(), requestReturnOk(), LOGIN).post(userLoginRequest).extract()
-            .header(AUTHORIZATION)
-        Selenide.open("/")
-        executeJavaScript<Any>("localStorage.setItem('authToken', arguments[0])", authHeader)
-        Selenide.open("/transfer")
-        `$`(Selectors.byText("🔄 Make a Transfer")).shouldBe(Condition.visible)
-        `$`(Selectors.byText("🔁 Transfer Again")).click()
-        `$`(Selectors.byText("Matching Transactions")).shouldBe(Condition.visible)
-        val allTransactions2 = `$`(Selectors.byText("Matching Transactions")).parent().findAll("li")
-        assertThat(allTransactions2).hasSize(0)
+        senderUser.authorizeAsUser()
+        val allTransactions = TransferPage().open().getAllTransactions()
+        assertThat(allTransactions).hasSize(0)
     }
 
 }

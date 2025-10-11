@@ -4,6 +4,7 @@ import framework.utils.generate
 import models.accounts.createAccount.CreateAccountResponse
 import models.accounts.deposit.DepositMoneyRequest
 import models.accounts.transfer.TransferMoneyRequest
+import models.admin.GetAllUserResponse
 import models.admin.createUser.CreateUserRequest
 import models.admin.createUser.CreateUserResponse
 import models.customer.updateCustomerProfile.UpdateCustomerProfileRequest
@@ -26,6 +27,9 @@ fun TestUser.transfer(transferMoneyRequest: TransferMoneyRequest) =
 
 fun TestUser.updateProfileName(updateCustomerProfileRequest: UpdateCustomerProfileRequest) =
     userSteps.updateName(updateCustomerProfileRequest)
+
+fun TestUser.getAllAccounts() = userSteps.getAllAccounts()
+fun TestUser.getCustomerProfile() = userSteps.getCustomerProfile()
 
 fun createUser(): TestUser {
     val userRequest = generate<CreateUserRequest>()
