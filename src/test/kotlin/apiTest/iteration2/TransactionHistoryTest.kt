@@ -20,13 +20,15 @@ class TransactionHistoryTest : BaseTest() {
     @Test
     @DisplayName("Check user transactions history")
     fun getTransactionHistory() {
-        val (sender, senderAccount) = createUserWithAccount()
+        val sender = createUserWithAccount()
+        val senderAccount = sender.getAccount()
 
         val depositAmount = BigDecimal("500.00")
         val depositMoneyRequest = DepositMoneyRequest(senderAccount.id, depositAmount)
         val depositMoneyResponse = sender.deposit(depositMoneyRequest)
+        val receiver = createUserWithAccount()
+        val receiverAccount = sender.getAccount()
 
-        val (receiver, receiverAccount) = createUserWithAccount()
         val transferOutAmount = BigDecimal("200.00")
         val transferMoneyOutRequest = TransferMoneyRequest(senderAccount.id, receiverAccount.id, transferOutAmount)
         val transferMoneyOutResponse = sender.transfer(transferMoneyOutRequest)

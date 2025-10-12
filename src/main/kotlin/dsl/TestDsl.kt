@@ -13,10 +13,16 @@ import steps.UserSteps
 
 data class TestUser(
     val userResponse: CreateUserResponse,
-    val originalPassword: String
+    val originalPassword: String,
+    private val account: CreateAccountResponse? = null
 ) {
     val username: String get() = userResponse.username
     val userSteps: UserSteps by lazy { UserSteps(username, originalPassword) }
+    val hasAccount: Boolean get() = account != null
+
+    fun getAccount(): CreateAccountResponse {
+        return account ?: throw IllegalStateException("User $username doesn't have an account")
+    }
 }
 
 fun TestUser.deposit(depositRequest: DepositMoneyRequest) =
@@ -30,6 +36,7 @@ fun TestUser.updateProfileName(updateCustomerProfileRequest: UpdateCustomerProfi
 
 fun TestUser.getAllAccounts() = userSteps.getAllAccounts()
 fun TestUser.getCustomerProfile() = userSteps.getCustomerProfile()
+fun TestUser.createAccount() = userSteps.createAccount()
 
 fun createUser(): TestUser {
     val userRequest = generate<CreateUserRequest>()
@@ -38,12 +45,12 @@ fun createUser(): TestUser {
     return TestUser(userResponse, originalPassword)
 }
 
-fun createAccount(user: TestUser): CreateAccountResponse {
-    return user.userSteps.createAccount()
-}
+//fun createAccount(user: TestUser): CreateAccountResponse {
+//    return user.userSteps.createAccount()
+//}
 
-fun createUserWithAccount(): Pair<TestUser, CreateAccountResponse> {
+fun createUserWithAccount(): TestUser {
     val user = createUser()
-    val account = createAccount(user)
-    return user to account
+    val account = user.userSteps.createAccount()
+    return TestUser(user.userResponse, user.originalPassword, account)
 }

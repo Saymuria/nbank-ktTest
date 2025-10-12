@@ -4,6 +4,7 @@ import com.codeborne.selenide.Condition
 import com.codeborne.selenide.ElementsCollection
 import com.codeborne.selenide.Selectors
 import com.codeborne.selenide.Selenide.`$`
+import ui.elements.TransactionElement
 
 class TransferPage : BasePage<TransferPage>() {
     private val transferTitle = `$`(Selectors.byText("🔄 Make a Transfer"))
@@ -45,7 +46,11 @@ class TransferPage : BasePage<TransferPage>() {
         return this
     }
 
-    fun getAllTransactions(): ElementsCollection = `$`(Selectors.byText("Matching Transactions")).parent().findAll("li")
+    fun getAllTransactions(): List<TransactionElement> {
+        val elementsCollection = `$`(Selectors.byText("Matching Transactions")).parent().findAll("li")
+        return generatePageElements(elementsCollection, ::TransactionElement)
+    }
+
 
     fun openTransferAgain(): TransferPage {
         transferTitle.shouldBe(Condition.visible)
@@ -53,6 +58,7 @@ class TransferPage : BasePage<TransferPage>() {
         matchingTransactionsTitle.shouldBe(Condition.visible)
         return this
     }
+
     fun searchTransactions(name: String): TransferPage {
         findTransactionInput.sendKeys(name)
         searchTransactionButton.click()

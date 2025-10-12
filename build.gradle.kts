@@ -69,8 +69,8 @@ dependencies {
     testImplementation("org.slf4j:slf4j-api:1.7.36")
     testImplementation("org.slf4j:slf4j-simple:1.7.36")
     // Тестирование
-    testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.3")
+    implementation("org.junit.jupiter:junit-jupiter:5.9.3")
+    implementation("org.junit.jupiter:junit-jupiter-params:5.9.3")
     testImplementation(kotlin("test"))
 }
 

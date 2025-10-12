@@ -51,7 +51,8 @@ class EditProfileTest : BaseTest() {
     @Test
     @DisplayName("User can set name to profile")
     fun userCanSetName() {
-        val (user, account) = createUserWithAccount()
+        val user = createUserWithAccount()
+        val account = user.getAccount()
         val updateCustomerProfileResponse = user.updateProfileName(generate<UpdateCustomerProfileRequest>())
         val getCustomerProfileResponse = GET_CUSTOMER_PROFILE.validatedRequest<GetCustomerProfileResponse>(
             auth = { authAsUser(user.username, user.originalPassword) },
@@ -66,7 +67,7 @@ class EditProfileTest : BaseTest() {
     @Test
     @DisplayName("User can change name in profile")
     fun userCanChangeUserName() {
-        val (user, account) = createUserWithAccount()
+        val user = createUserWithAccount()
         val updateCustomerProfileResponse = user.updateProfileName(generate<UpdateCustomerProfileRequest>())
         val changeCustomerProfileResponse = user.updateProfileName(generate<UpdateCustomerProfileRequest>())
         val getCustomerProfileResponse = GET_CUSTOMER_PROFILE.validatedRequest<GetCustomerProfileResponse>(
@@ -82,7 +83,7 @@ class EditProfileTest : BaseTest() {
     @ParameterizedTest
     @MethodSource("validNames")
     fun userCanSetValidName(validName: String) {
-        val (user, account) = createUserWithAccount()
+        val user = createUserWithAccount()
         val updateCustomerProfileResponse = user.updateProfileName(UpdateCustomerProfileRequest(validName))
         val getCustomerProfileResponse = GET_CUSTOMER_PROFILE.validatedRequest<GetCustomerProfileResponse>(
             auth = { authAsUser(user.username, user.originalPassword) },
@@ -94,7 +95,7 @@ class EditProfileTest : BaseTest() {
     @ParameterizedTest
     @MethodSource("invalidNames")
     fun userCannotSetInvalidName(invalidName: String) {
-        val (user, account) = createUserWithAccount()
+        val user = createUserWithAccount()
         val updateCustomerProfileRequest = UpdateCustomerProfileRequest(invalidName)
         UPDATE_CUSTOMER_PROFILE.request(
             auth = { authAsUser(user.username, user.originalPassword) },

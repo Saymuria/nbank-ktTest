@@ -1,8 +1,8 @@
 package ui.pages
 
-import com.codeborne.selenide.ElementsCollection
 import com.codeborne.selenide.Selectors
 import com.codeborne.selenide.Selenide.`$`
+import ui.elements.UserBage
 
 class AdminPanel : BasePage<AdminPanel>() {
     private val adminPanelText = `$`(Selectors.byText("Admin Panel"))
@@ -21,8 +21,8 @@ class AdminPanel : BasePage<AdminPanel>() {
         return this
     }
 
-    fun getAllUsers(): ElementsCollection {
-        return `$`(Selectors.byText("All Users")).parent().findAll("li")
+    fun getAllUsers(): List<UserBage> {
+        val elementsCollection = `$`(Selectors.byText("All Users")).parent().findAll("li")
+        return generatePageElements(elementsCollection, ::UserBage)
     }
-
 }

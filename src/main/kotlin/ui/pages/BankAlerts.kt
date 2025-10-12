@@ -5,7 +5,7 @@ enum class BankAlerts(val message: String) {
     USERNAME_MUST_BE_BETWEEN_3_AND_15_CHARACTERS("Username must be between 3 and 15 characters"),
     NEW_ACCOUNT_CREATED("✅ New Account Created! Account Number: "),
     SUCCESSFUL_DEPOSIT("✅ Successfully deposited \$%s to account %s!"),
-    INVALID_DEPOSIT_SUM("User cannot make deposit for sum more than 10000.00"),
+    INVALID_DEPOSIT_SUM("❌ Please deposit less or equal to 5000\$."),
     ACCOUNT_SELECTION_NEEDED("Please select an account."),
     FILLING_VALID_SUM_NEEDED("Please enter a valid amount."),
     NAME_UPDATED_SUCCESSFULLY("✅ Name updated successfully!"),

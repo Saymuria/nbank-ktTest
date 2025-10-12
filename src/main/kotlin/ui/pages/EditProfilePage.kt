@@ -19,6 +19,7 @@ class EditProfilePage : BasePage<EditProfilePage>() {
         saveChangesButton.click()
         return this
     }
+
     fun changeName(name: String, newName: String): EditProfilePage {
         editProfileTitle.shouldBe(Condition.visible)
         enterNameInput.click()
@@ -28,11 +29,10 @@ class EditProfilePage : BasePage<EditProfilePage>() {
         saveChangesButton.click()
         return this
     }
+
     fun tryToSubmitEmptyInputName(): EditProfilePage {
         editProfileTitle.shouldBe(Condition.visible)
         saveChangesButton.click()
         return this
     }
-
-
 }
