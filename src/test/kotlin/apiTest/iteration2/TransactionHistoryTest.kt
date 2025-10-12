@@ -1,11 +1,7 @@
-package iteration2
+package apiTest.iteration2
 
-import BaseTest
-import dsl.check
-import dsl.createUserWithAccount
-import dsl.deposit
-import dsl.transfer
-import dsl.validatedRequest
+import apiTest.BaseTest
+import dsl.*
 import entities.OperationType.TRANSFER_IN
 import entities.OperationType.TRANSFER_OUT
 import framework.skeleton.Endpoint.GET_ALL_TRANSACTIONS

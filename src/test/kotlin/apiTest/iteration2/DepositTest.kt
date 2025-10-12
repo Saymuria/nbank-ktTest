@@ -1,6 +1,6 @@
-package iteration2
+package apiTest.iteration2
 
-import BaseTest
+import apiTest.BaseTest
 import dsl.createUserWithAccount
 import dsl.deposit
 import dsl.request

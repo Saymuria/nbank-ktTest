@@ -1,13 +1,7 @@
-package iteration2
+package apiTest.iteration2
 
-import BaseTest
-import dsl.createUserWithAccount
-import dsl.deposit
-import dsl.transfer
-import dsl.check
-import dsl.request
-import dsl.validatedRequest
-import framework.skeleton.Endpoint
+import apiTest.BaseTest
+import dsl.*
 import framework.skeleton.Endpoint.GET_CUSTOMER_PROFILE
 import framework.skeleton.Endpoint.TRANSFER_MONEY
 import framework.specs.RequestSpecs.Companion.authAsUser

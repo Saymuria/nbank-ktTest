@@ -34,7 +34,15 @@ configurations.all {
             "com.fasterxml.jackson.core:jackson-core:2.15.3",
             "com.fasterxml.jackson.core:jackson-annotations:2.15.3"
         )
-
+        force(
+            "net.bytebuddy:byte-buddy:1.17.5",
+            "org.opentest4j:opentest4j:1.3.0",
+            "org.apache.httpcomponents.client5:httpclient5:5.4.3",
+            "org.slf4j:slf4j-api:1.7.36",
+            "com.google.errorprone:error_prone_annotations:2.38.0",
+            "com.google.guava:guava:33.4.8-jre",
+            "org.apache.commons:commons-lang3:3.17.0"
+        )
         failOnVersionConflict()
     }
 }
@@ -42,7 +50,8 @@ configurations.all {
 dependencies {
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.23")
-
+    //Selenide
+    testImplementation("com.codeborne:selenide:7.9.1")
     // Jackson
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.3") {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-reflect")
@@ -56,7 +65,9 @@ dependencies {
 
     //asserts
     implementation("org.assertj:assertj-core:3.24.2")
-
+// SLF4J API + Simple implementation
+    testImplementation("org.slf4j:slf4j-api:1.7.36")
+    testImplementation("org.slf4j:slf4j-simple:1.7.36")
     // Тестирование
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.3")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.3")
