@@ -16,5 +16,5 @@ object Config {
         }
     }
 
-    fun getProperty(key: String): String? = properties.getProperty(key)
+    fun getProperty(key: String): String = properties.getProperty(key)
 }

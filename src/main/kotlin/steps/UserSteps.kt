@@ -1,21 +1,27 @@
 package steps
 
+import dsl.validatedRequest
 import framework.skeleton.Endpoint
 import framework.skeleton.Endpoint.CREATE_ACCOUNT
+import framework.skeleton.Endpoint.GET_CUSTOMER_ACCOUNTS
+import framework.skeleton.Endpoint.GET_CUSTOMER_PROFILE
 import framework.skeleton.Endpoint.UPDATE_CUSTOMER_PROFILE
 import framework.skeleton.requesters.ValidatedCrudRequester
 import framework.specs.RequestSpecs.Companion.authAsUser
 import framework.specs.ResponseSpec.Companion.entityWasCreated
 import framework.specs.ResponseSpec.Companion.requestReturnOk
+import io.restassured.http.Method.GET
 import models.accounts.createAccount.CreateAccountResponse
 import models.accounts.deposit.DepositMoneyRequest
 import models.accounts.deposit.DepositMoneyResponse
 import models.accounts.transfer.TransferMoneyRequest
 import models.accounts.transfer.TransferMoneyResponse
+import models.customer.GetCustomerAccountsResponse
+import models.customer.GetCustomerProfileResponse
 import models.customer.updateCustomerProfile.UpdateCustomerProfileRequest
 import models.customer.updateCustomerProfile.UpdateCustomerProfileResponse
 
-class UserSteps(val username: String,val  password: String) {
+class UserSteps(val username: String, val password: String) {
 
     fun createAccount(): CreateAccountResponse {
         return ValidatedCrudRequester<CreateAccountResponse>(
@@ -40,11 +46,25 @@ class UserSteps(val username: String,val  password: String) {
         ).post(request)
     }
 
-    fun updateName(request: UpdateCustomerProfileRequest) : UpdateCustomerProfileResponse {
-       return ValidatedCrudRequester<UpdateCustomerProfileResponse>(
-           authAsUser(username, password),
-           requestReturnOk(),
-           UPDATE_CUSTOMER_PROFILE
-       ).update(null, request)
+    fun updateName(request: UpdateCustomerProfileRequest): UpdateCustomerProfileResponse {
+        return ValidatedCrudRequester<UpdateCustomerProfileResponse>(
+            authAsUser(username, password),
+            requestReturnOk(),
+            UPDATE_CUSTOMER_PROFILE
+        ).update(null, request)
+    }
+
+    fun getAllAccounts(): GetCustomerAccountsResponse {
+        return GET_CUSTOMER_ACCOUNTS.validatedRequest<GetCustomerAccountsResponse>(
+            auth = { authAsUser(username, password) },
+            method = GET
+        )
+    }
+
+    fun getCustomerProfile(): GetCustomerProfileResponse {
+        return GET_CUSTOMER_PROFILE.validatedRequest<GetCustomerProfileResponse>(
+            auth = { authAsUser(username, password) },
+            method = GET
+        )
     }
 }

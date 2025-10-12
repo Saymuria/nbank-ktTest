@@ -9,4 +9,10 @@ data class LoginUserRequest(
     val username: String,
     @Password
     val password: String,
-) : BaseModel
+) : BaseModel{
+    companion object{
+        fun getAdmin(): LoginUserRequest {
+            return LoginUserRequest(configs.Config.getProperty("admin.username"), configs.Config.getProperty("admin.password"))
+        }
+    }
+}

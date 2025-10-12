@@ -31,7 +31,7 @@ class RequestSpecs {
                 .setContentType(ContentType.JSON)
                 .setAccept(ContentType.JSON)
                 .addFilters(listOf(RequestLoggingFilter(), ResponseLoggingFilter()))
-                .setBaseUri(Config.getProperty("server") + Config.getProperty("apiVersion"))
+                .setBaseUri(Config.getProperty("apiBaseUrl") + Config.getProperty("apiVersion"))
 
         }
 
@@ -46,6 +46,12 @@ class RequestSpecs {
         }
 
         fun authAsUser(userName: String, password: String): RequestSpecification {
+            return defaultRequestBuilder()
+                .addHeader(AUTHORIZATION, getUserAuthHeader(userName, password))
+                .build()
+        }
+
+        fun getUserAuthHeader(userName: String, password: String) :String {
             val userAuthHeader = tokenCache[userName] ?: run {
                 val newToken = CrudRequester(unAuthSpec(), ResponseSpec.requestReturnOk(), Endpoint.LOGIN).post(
                     LoginUserRequest(userName, password)
@@ -55,9 +61,7 @@ class RequestSpecs {
                 tokenCache[userName] = newToken
                 newToken
             }
-            return defaultRequestBuilder()
-                .addHeader(AUTHORIZATION, userAuthHeader)
-                .build()
+           return userAuthHeader
         }
     }
 }

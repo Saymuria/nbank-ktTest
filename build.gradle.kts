@@ -51,7 +51,7 @@ dependencies {
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.23")
     //Selenide
-    testImplementation("com.codeborne:selenide:7.9.1")
+    implementation("com.codeborne:selenide:7.9.1")
     // Jackson
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.3") {
         exclude(group = "org.jetbrains.kotlin", module = "kotlin-reflect")
