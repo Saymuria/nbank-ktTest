@@ -60,6 +60,7 @@ class TransferPage : BasePage<TransferPage>() {
     }
 
     fun searchTransactions(name: String): TransferPage {
+        findTransactionInput.clear()
         findTransactionInput.sendKeys(name)
         searchTransactionButton.click()
         return this

@@ -34,7 +34,7 @@ class DepositTest : BaseTest() {
         @JvmStatic
         private fun invalidDepositSum(): Stream<Arguments> {
             return Stream.of(
-                of(BigDecimal("10000.01")), //больше максимума
+                of(BigDecimal("5000.01")), //больше максимума
                 of(BigDecimal("0.99")), //меньше минимума
                 of(BigDecimal("-1.00")), //отрицаильное значение
                 of(BigDecimal("0.001")), //
@@ -44,7 +44,7 @@ class DepositTest : BaseTest() {
     }
 
     @Test
-    @DisplayName("User can make deposit to bank account: 1.00 < deposit < 10000.00")
+    @DisplayName("User can make deposit to bank account: 1.00 < deposit < 5000.00")
     fun makeDepositInValidRange() {
         val user = createUserWithAccount()
         val account = user.getAccount()
@@ -58,8 +58,8 @@ class DepositTest : BaseTest() {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["1.00", "10000.00"])
-    @DisplayName("User can make deposit to bank account: 1.00 < deposit < 10000.00")
+    @ValueSource(strings = ["1.00", "5000.00"])
+    @DisplayName("User can make deposit to bank account: 1.00 < deposit < 5000.00")
     fun makeDepositEdgeCheck(depositSum: String) {
         val user = createUserWithAccount()
         val account = user.getAccount()

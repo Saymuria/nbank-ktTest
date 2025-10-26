@@ -135,6 +135,10 @@ class ValueGenerator {
                 val (min, max) = pattern.split("-").map { it.toInt() }
                 generateNumericString(min, max)
             }
+            pattern.matches(Regex("^\\^\\[A-Za-z\\]\\+\\\\s\\[A-Za-z\\]\\+\\$\$")) -> {
+                // Обработка паттерна ^[A-Za-z]+\s[A-Za-z]+$
+                generateRandomNameWithSpace()
+            }
             else -> {
                 // Базовая обработка простых паттернов
                 val length = extractLengthFromPattern(pattern) ?: (8 to 12)
@@ -148,6 +152,20 @@ class ValueGenerator {
                 }
             }
         }
+    }
+
+    private fun generateRandomNameWithSpace(): String {
+        fun generateWord(minLength: Int = 3, maxLength: Int = 8): String {
+            val length = random.nextInt(maxLength - minLength + 1) + minLength
+            val firstChar = ('A'..'Z').random()
+            val restChars = (1 until length).map { ('a'..'z').random() }.joinToString("")
+            return "$firstChar$restChars"
+        }
+
+        val firstName = generateWord(3, 8)
+        val lastName = generateWord(3, 10)
+
+        return "$firstName $lastName"
     }
 
     private fun extractLengthFromPattern(pattern: String): Pair<Int, Int>? {
