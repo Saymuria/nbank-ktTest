@@ -1,25 +1,31 @@
 package uiTest
 
-import dsl.createUser
-import dsl.getAllAccounts
+import common.annotations.Browsers
+import common.annotations.UserSession
+import dsl.invoke
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import ui.pages.BankAlerts
+import storage.SessionStorage
+import ui.pages.BankAlerts.NEW_ACCOUNT_CREATED
 import ui.pages.UserDashboard
 
 class CreateAccountTest : BaseUiTest() {
-
+    val userDashboard = UserDashboard()
 
     @Test
+    @UserSession
+    @Browsers(["chrome"])
     fun userCanCreateAccountTest() {
-
-        val user = createUser()
-        user.authorizeAsUser()
-        UserDashboard().open().createNewAccount()
-        val existingUserAccount = user.getAllAccounts()
+        userDashboard {
+            open()
+            createNewAccount()
+        }
+        val existingUserAccount = SessionStorage.getSteps().getAllAccounts()
         assertThat(existingUserAccount.accounts).hasSize(1)
         val account = existingUserAccount.accounts.first()
-        UserDashboard().checkAlertMessageAndAccept(BankAlerts.NEW_ACCOUNT_CREATED.message + account.accountNumber)
+        userDashboard {
+            checkAlertMessageAndAccept(NEW_ACCOUNT_CREATED.message + account.accountNumber)
+        }
         assertThat(account.balance).isZero
     }
 }

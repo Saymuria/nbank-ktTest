@@ -2,13 +2,13 @@ package uiTest
 
 import apiTest.BaseTest
 import com.codeborne.selenide.Configuration
-import com.codeborne.selenide.Selenide
-import com.codeborne.selenide.Selenide.executeJavaScript
-import dsl.TestUser
-import framework.specs.RequestSpecs.Companion.getUserAuthHeader
-import models.authentication.LoginUserRequest
+import common.extensions.AdminSessionExtension
+import common.extensions.UserSessionExtension
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.extension.ExtendWith
 
+@ExtendWith(AdminSessionExtension::class)
+@ExtendWith(UserSessionExtension::class)
 abstract class BaseUiTest : BaseTest() {
     companion object {
         @JvmStatic
@@ -23,19 +23,4 @@ abstract class BaseUiTest : BaseTest() {
             )
         }
     }
-
-    fun authorizeAsUser(username: String, password: String) {
-        Selenide.open("/")
-        val authHeader = getUserAuthHeader(username, password)
-        executeJavaScript<Any>("localStorage.setItem('authToken', arguments[0])", authHeader)
-    }
-
-    fun authorizeAsUser(loginUserRequest: LoginUserRequest) {
-        authorizeAsUser(loginUserRequest.username, loginUserRequest.password)
-    }
-
-    fun TestUser.authorizeAsUser() {
-        authorizeAsUser(username, originalPassword)
-    }
-
 }

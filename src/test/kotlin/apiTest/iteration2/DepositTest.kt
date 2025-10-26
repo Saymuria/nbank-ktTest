@@ -46,7 +46,8 @@ class DepositTest : BaseTest() {
     @Test
     @DisplayName("User can make deposit to bank account: 1.00 < deposit < 10000.00")
     fun makeDepositInValidRange() {
-        val (user, account) = createUserWithAccount()
+        val user = createUserWithAccount()
+        val account = user.getAccount()
         val depositResponse = user.deposit(generate<DepositMoneyRequest>(mapOf("id" to account.id)))
         val userTransaction = GET_ALL_TRANSACTIONS.validatedRequest<GetAccountTransactionsResponse>(
             auth = { authAsUser(user.username, user.originalPassword) },
@@ -60,7 +61,8 @@ class DepositTest : BaseTest() {
     @ValueSource(strings = ["1.00", "10000.00"])
     @DisplayName("User can make deposit to bank account: 1.00 < deposit < 10000.00")
     fun makeDepositEdgeCheck(depositSum: String) {
-        val (user, account) = createUserWithAccount()
+        val user = createUserWithAccount()
+        val account = user.getAccount()
         val depositResponse = user.deposit(DepositMoneyRequest(account.id, BigDecimal(depositSum)))
         val userTransaction = GET_ALL_TRANSACTIONS.validatedRequest<GetAccountTransactionsResponse>(
             auth = { authAsUser(user.username, user.originalPassword) },
@@ -77,7 +79,8 @@ class DepositTest : BaseTest() {
     fun depositWithInvalidDepositSum(
         invalidDepositSum: BigDecimal
     ) {
-        val (user, account) = createUserWithAccount()
+        val user = createUserWithAccount()
+        val account = user.getAccount()
         DEPOSIT_MONEY.request(
             auth = { authAsUser(user.username, user.originalPassword) },
             response = { requestReturnsBadRequest() },

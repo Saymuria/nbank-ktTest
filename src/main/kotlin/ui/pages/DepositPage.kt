@@ -3,6 +3,7 @@ package ui.pages
 import com.codeborne.selenide.Condition
 import com.codeborne.selenide.Selectors
 import com.codeborne.selenide.Selenide.`$`
+import com.codeborne.selenide.SelenideElement
 
 class DepositPage : BasePage<DepositPage>() {
     private val depositTitle = `$`(Selectors.byText("💰 Deposit Money"))
@@ -21,11 +22,12 @@ class DepositPage : BasePage<DepositPage>() {
         return this
     }
 
-    fun userSeeHisBalanceInSelect(depositSum: String, accountNumber: String): DepositPage {
+    fun userSeeHisBalanceInSelect(accountNumber: String): SelenideElement {
         depositTitle.shouldBe(Condition.visible)
         accountSelect.click()
-        accountSelect.selectOptionContainingText("$accountNumber (Balance: \$$depositSum)")
-        return this
+        accountSelect.selectOptionContainingText(accountNumber)
+        val selectedOption = accountSelect.selectedOption
+        return selectedOption
     }
 
     fun tryToMakeDepositWithoutFillingForm(): DepositPage {

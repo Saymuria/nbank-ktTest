@@ -14,6 +14,22 @@ import models.admin.createUser.CreateUserResponse
 
 
 class AdminSteps {
+    companion object{
+        fun createUser(createUserRequest: CreateUserRequest): CreateUserResponse {
+            return ValidatedCrudRequester<CreateUserResponse>(
+                RequestSpecs.adminAuthSpec(),
+                ResponseSpec.entityWasCreated(),
+                Endpoint.CREATE_USER,
+            ).post(createUserRequest)
+        }
+
+        fun getAllUsers(): GetAllUserResponse {
+            return GET_ALL_USER.validatedRequest<GetAllUserResponse>(
+                auth = { adminAuthSpec() },
+                method = GET
+            )
+        }
+    }
 
     fun createUser(createUserRequest: CreateUserRequest): CreateUserResponse {
         return ValidatedCrudRequester<CreateUserResponse>(

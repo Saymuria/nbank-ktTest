@@ -40,8 +40,10 @@ class TransferTest : BaseTest() {
     @Test
     @DisplayName("User can make transfer through his accounts all sum")
     fun transferAllDepositTroughAccounts() {
-        val (sender, senderAccount) = createUserWithAccount()
-        val (receiver, receiverAccount) = createUserWithAccount()
+        val sender = createUserWithAccount()
+        val senderAccount = sender.getAccount()
+        val receiver = createUserWithAccount()
+        val receiverAccount = sender.getAccount()
         val depositMoneyRequest = generate<DepositMoneyRequest>(mapOf("id" to senderAccount.id))
         sender.deposit(depositMoneyRequest)
         val transferMoneyRequest =
@@ -60,11 +62,13 @@ class TransferTest : BaseTest() {
     @Test
     @DisplayName("User can make transfer to other user's account")
     fun transferMoney() {
-        val (sender, senderAccount) = createUserWithAccount()
+        val sender = createUserWithAccount()
+        val senderAccount = sender.getAccount()
         val validDepositSum = BigDecimal("300.00")
         sender.deposit(DepositMoneyRequest(senderAccount.id, validDepositSum))
 
-        val (receiver, receiverAccount) = createUserWithAccount()
+        val receiver = createUserWithAccount()
+        val receiverAccount = sender.getAccount()
 
         val transfer = BigDecimal("50.00")
         val transferMoneyRequest = TransferMoneyRequest(senderAccount.id, receiverAccount.id, transfer)
@@ -85,10 +89,12 @@ class TransferTest : BaseTest() {
     @ValueSource(strings = ["1.00", "5000.00"])
     @DisplayName("User can make transfer with edge amount")
     fun makeTransferEdgeCheck(transferSum: String) {
-        val (sender, senderAccount) = createUserWithAccount()
+        val sender = createUserWithAccount()
+        val senderAccount = sender.getAccount()
         val validDepositSum = BigDecimal("5500.00")
         sender.deposit(DepositMoneyRequest(senderAccount.id, validDepositSum))
-        val (receiver, receiverAccount) = createUserWithAccount()
+        val receiver = createUserWithAccount()
+        val receiverAccount = sender.getAccount()
 
         val transferMoneyRequest = TransferMoneyRequest(senderAccount.id, receiverAccount.id, BigDecimal(transferSum))
         val transferMoneyResponse = sender.transfer(transferMoneyRequest)
@@ -104,10 +110,12 @@ class TransferTest : BaseTest() {
     fun depositWithInvalidDepositSum(
         invalidTransferSum: BigDecimal
     ) {
-        val (sender, senderAccount) = createUserWithAccount()
+        val sender = createUserWithAccount()
+        val senderAccount = sender.getAccount()
         val validDepositSum = BigDecimal("10000.00")
         sender.deposit(DepositMoneyRequest(senderAccount.id, validDepositSum))
-        val (receiver, receiverAccount) = createUserWithAccount()
+        val receiver = createUserWithAccount()
+        val receiverAccount = sender.getAccount()
         val transferMoneyRequest = TransferMoneyRequest(senderAccount.id, receiverAccount.id, invalidTransferSum)
         TRANSFER_MONEY.request(
             auth = { authAsUser(sender.username, sender.originalPassword) },

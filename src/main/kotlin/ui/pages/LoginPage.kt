@@ -11,12 +11,10 @@ class LoginPage : BasePage<LoginPage>() {
         return "/login"
     }
 
-    fun login(username: String, password: String) :LoginPage {
+    fun login(username: String, password: String): LoginPage {
         usernameInput.sendKeys(username)
         passwordInput.sendKeys(password)
         button.click()
         return this
     }
-
-
 }

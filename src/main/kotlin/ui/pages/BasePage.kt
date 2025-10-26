@@ -1,11 +1,18 @@
 package ui.pages
 
 import com.codeborne.selenide.Condition
+import com.codeborne.selenide.ElementsCollection
 import com.codeborne.selenide.Selectors
 import com.codeborne.selenide.Selenide
 import com.codeborne.selenide.Selenide.`$`
+import com.codeborne.selenide.Selenide.executeJavaScript
 import com.codeborne.selenide.Selenide.switchTo
+import com.codeborne.selenide.SelenideElement
+import dsl.TestUser
+import framework.specs.RequestSpecs.Companion.getUserAuthHeader
+import models.authentication.LoginUserRequest
 import org.assertj.core.api.Assertions.assertThat
+import ui.elements.BaseElement
 
 abstract class BasePage<T : BasePage<T>> {
     abstract fun url(): String
@@ -17,6 +24,21 @@ abstract class BasePage<T : BasePage<T>> {
     protected val accountSelect = `$`("select")
     protected val amountInput = `$`(Selectors.byAttribute("placeholder", "Enter amount"))
 
+    companion object {
+        fun authorizeAsUser(username: String, password: String) {
+            Selenide.open("/")
+            val authHeader = getUserAuthHeader(username, password)
+            executeJavaScript<Any>("localStorage.setItem('authToken', arguments[0])", authHeader)
+        }
+
+        fun authorizeAsUser(loginUserRequest: LoginUserRequest) {
+            authorizeAsUser(loginUserRequest.username, loginUserRequest.password)
+        }
+
+        fun TestUser.authorizeAsUser() {
+            authorizeAsUser(username, originalPassword)
+        }
+    }
 
 
     @Suppress("UNCHECKED_CAST")
@@ -48,11 +70,17 @@ abstract class BasePage<T : BasePage<T>> {
         return this as T
     }
 
-
     fun refreshAndCheckUserName(name: String): T {
         Selenide.refresh()
         userNameButton.shouldBe(Condition.visible).shouldHave(Condition.text(name))
         return this as T
     }
+
+
+    //ElementCollection -> List<BaseElement>
+    protected inline fun <reified T : BaseElement> generatePageElements(
+        elementsCollection: ElementsCollection,
+        constructor: (SelenideElement) -> T
+    ) = elementsCollection.map(constructor)
 
 }
