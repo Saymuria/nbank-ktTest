@@ -9,6 +9,8 @@ import framework.utils.generate
 import models.accounts.deposit.DepositMoneyRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.parallel.Execution
+import org.junit.jupiter.api.parallel.ExecutionMode
 import storage.SessionStorage
 import ui.pages.BankAlerts
 import ui.pages.BankAlerts.*
@@ -17,10 +19,11 @@ import ui.pages.UserDashboard
 import java.math.BigDecimal
 
 class DepositTest : BaseUiTest() {
-    val userDashboard = UserDashboard()
+    val userDashboard by lazy { UserDashboard() }
 
     @Test
     @UserSession(withAccount = true)
+    @Execution(ExecutionMode.SAME_THREAD)
     fun userCanMakeDepositWithValidSumTest() {
         val depositSum = "500.0"
         val user = SessionStorage.getUser()
@@ -37,6 +40,7 @@ class DepositTest : BaseUiTest() {
 
     @Test
     @UserSession(withAccount = true)
+    @Execution(ExecutionMode.SAME_THREAD)
     fun userCanMakeDepositWithInValidSumTest() {
         val depositSum = "5000.01"
         val user = SessionStorage.getUser()
@@ -53,6 +57,7 @@ class DepositTest : BaseUiTest() {
 
     @Test
     @UserSession(withAccount = true)
+    @Execution(ExecutionMode.SAME_THREAD)
     fun userCanSeeHisBalanceTest() {
         val depositSum = BigDecimal("500.00")
         val user = SessionStorage.getUser()
@@ -69,6 +74,7 @@ class DepositTest : BaseUiTest() {
 
     @Test
     @UserSession(withAccount = true)
+    @Execution(ExecutionMode.SAME_THREAD)
     fun userCannotSubmitFormWithoutAccountSelectionTest() {
         val depositSum = BigDecimal("500.00")
         val user = SessionStorage.getUser()
@@ -86,6 +92,7 @@ class DepositTest : BaseUiTest() {
 
     @Test
     @UserSession(withAccount = true)
+    @Execution(ExecutionMode.SAME_THREAD)
     fun userCannotSubmitFormWithoutDepositSumTest() {
         val depositSum = BigDecimal("500.00")
         val user = SessionStorage.getUser()

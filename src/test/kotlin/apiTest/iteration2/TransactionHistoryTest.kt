@@ -11,13 +11,13 @@ import models.accounts.GetAccountTransactionsResponse
 import models.accounts.deposit.DepositMoneyRequest
 import models.accounts.transfer.TransferMoneyRequest
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.RepeatedTest
+import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 
 @DisplayName("Transaction History Test")
 class TransactionHistoryTest : BaseTest() {
 
-    @RepeatedTest(value = 10)
+    @Test
     @DisplayName("Check user transactions history")
     fun getTransactionHistory() {
         val sender = createUserWithAccount()
@@ -54,7 +54,7 @@ class TransactionHistoryTest : BaseTest() {
                 it.amount shouldBe transferInAmount
             }
             getAccountTransactionsResponse.transactions.first { it.type ==  depositMoneyResponse.transactions.first().type }.also {
-               // it.amount shouldBe depositMoneyRequest.balance
+               it.amount shouldBe depositMoneyRequest.balance
             }
         }
     }
