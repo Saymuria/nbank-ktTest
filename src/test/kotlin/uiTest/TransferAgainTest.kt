@@ -15,8 +15,8 @@ import ui.pages.TransferPage
 import java.math.BigDecimal
 
 class TransferAgainTest : BaseUiTest() {
-    val valueGenerator = ValueGenerator()
-    val transferPage = TransferPage()
+    val valueGenerator by lazy { ValueGenerator() }
+    val transferPage by lazy { TransferPage() }
 
     @Test
     @UserSession(value = 2, withAccount = true)

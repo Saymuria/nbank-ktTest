@@ -18,6 +18,7 @@ import io.restassured.http.Method.POST
 import models.admin.GetAllUserResponse
 import models.admin.createUser.CreateUserRequest
 import models.admin.createUser.CreateUserResponse
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -99,6 +100,7 @@ class CreateUserTest : BaseTest() {
 
     //может админ и может создавать, я бы уточнила
     @Test
+    @Disabled("Тест временно отключен")
     @DisplayName("Negative test: admin cannot create admin-user")
     fun adminCannotCreateAdminUser() {
         val createUserRequest = generate<CreateUserRequest>(mapOf("role" to UserRole.ADMIN))

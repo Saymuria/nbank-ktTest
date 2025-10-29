@@ -70,10 +70,11 @@ dependencies {
     testImplementation("org.slf4j:slf4j-simple:1.7.36")
     // Тестирование
     implementation("org.junit.jupiter:junit-jupiter:5.9.3")
+    implementation("org.junit.platform:junit-platform-engine:1.9.3")
     implementation("org.junit.jupiter:junit-jupiter-params:5.9.3")
     testImplementation(kotlin("test"))
 }
 
 tasks.test {
     useJUnitPlatform()
-}
+ }

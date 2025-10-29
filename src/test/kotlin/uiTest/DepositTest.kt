@@ -17,7 +17,7 @@ import ui.pages.UserDashboard
 import java.math.BigDecimal
 
 class DepositTest : BaseUiTest() {
-    val userDashboard = UserDashboard()
+    val userDashboard by lazy { UserDashboard() }
 
     @Test
     @UserSession(withAccount = true)

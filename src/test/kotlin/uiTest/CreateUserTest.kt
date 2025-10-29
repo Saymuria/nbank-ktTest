@@ -15,7 +15,7 @@ import ui.pages.BankAlerts
 import ui.pages.BankAlerts.USER_CREATED_SUCCESSFULLY
 
 class CreateUserTest : BaseUiTest() {
-    val adminPanel = AdminPanel()
+    val adminPanel  by lazy { AdminPanel() }
 
     @Test
     @AdminSession

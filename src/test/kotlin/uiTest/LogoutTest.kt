@@ -10,7 +10,7 @@ import ui.pages.LoginPage
 import ui.pages.UserDashboard
 
 class LogoutTest : BaseUiTest() {
-    val userDashboard = UserDashboard()
+    val userDashboard by lazy { UserDashboard() }
 
     @Test
     @UserSession

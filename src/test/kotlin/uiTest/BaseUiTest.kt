@@ -2,10 +2,11 @@ package uiTest
 
 import apiTest.BaseTest
 import com.codeborne.selenide.Configuration
+import com.codeborne.selenide.Selenide
 import common.extensions.AdminSessionExtension
 import common.extensions.UserSessionExtension
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeAll import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(AdminSessionExtension::class)
 @ExtendWith(UserSessionExtension::class)
@@ -21,6 +22,14 @@ abstract class BaseUiTest : BaseTest() {
             Configuration.browserCapabilities.setCapability(
                 "selenoid:options", mapOf("enableVNC" to true, "enableLog" to true)
             )
+        }
+    }
+    @AfterEach
+    fun cleanup() {
+        try {
+            Selenide.clearBrowserLocalStorage()
+        } finally {
+            Selenide.closeWebDriver()
         }
     }
 }
