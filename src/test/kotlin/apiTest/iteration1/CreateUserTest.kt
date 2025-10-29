@@ -28,7 +28,8 @@ import java.util.stream.Stream
 
 private const val INVALID_PASSWORD_ERROR =
     "Password must contain at least one digit, one lower case, one upper case, one special character, no spaces, and be at least 8 characters long"
-private const val INVALID_USERNAME_ERROR = "Username must be between 3 and 15 characters"
+private const val INVALID_USERNAME_LENGTH_ERROR = "Username must be between 3 and 15 characters"
+private const val INVALID_USERNAME_CHARACTERS_ERROR = "Username must contain only letters, digits, dashes, underscores, and dots"
 private const val USERNAME = "username"
 private const val PASSWORD = "password"
 private const val STRONG_PASSWORD = "verysTRongPassword33$"
@@ -40,22 +41,21 @@ class CreateUserTest : BaseTest() {
         @JvmStatic
         private fun userInvalidData(): Stream<Arguments> {
             return Stream.of(
-                of("   ", STRONG_PASSWORD, USERNAME, "Username cannot be blank"),
-                of("ab", STRONG_PASSWORD, USERNAME, INVALID_USERNAME_ERROR),
-                of("abshdfkdofdfjdfd", STRONG_PASSWORD, USERNAME, INVALID_USERNAME_ERROR),
+                of("   ", STRONG_PASSWORD, USERNAME, listOf("Username cannot be blank", INVALID_USERNAME_CHARACTERS_ERROR)),
+                of("ab", STRONG_PASSWORD, USERNAME, listOf(INVALID_USERNAME_LENGTH_ERROR)),
+                of("abshdfkdofdfjdfd", STRONG_PASSWORD, USERNAME, listOf(INVALID_USERNAME_LENGTH_ERROR)),
                 of(
                     "!@#$%^&*()+=",
                     "verysTRongPassword33$",
-                    USERNAME,
-                    "Username must contain only letters, digits, dashes, underscores, and dots"
+                    USERNAME,listOf(INVALID_USERNAME_CHARACTERS_ERROR)
                 ),
-                of("dkdgld8304_1", "   ", PASSWORD, "Password cannot be blank"),
-                of("dkdgld8304_2", "Djf2@4o", PASSWORD, INVALID_PASSWORD_ERROR),
-                of("validuser_1", "Nodigit!", PASSWORD, INVALID_PASSWORD_ERROR),
-                of("validuser_2", "nouppercase1!", PASSWORD, INVALID_PASSWORD_ERROR),
-                of("validuser_3", "NOLOWERCASE1!", PASSWORD, INVALID_PASSWORD_ERROR),
-                of("validuser_4", "NoSpecialChar1", PASSWORD, INVALID_PASSWORD_ERROR),
-                of("validuser_5", "With space 1!", PASSWORD, INVALID_PASSWORD_ERROR),
+                of("dkdgld8304_1", "   ", PASSWORD, listOf("Password cannot be blank", INVALID_PASSWORD_ERROR)),
+                of("dkdgld8304_2", "Djf2@4o", PASSWORD, listOf(INVALID_PASSWORD_ERROR)),
+                of("validuser_1", "Nodigit!", PASSWORD, listOf(INVALID_PASSWORD_ERROR)),
+                of("validuser_2", "nouppercase1!", PASSWORD, listOf(INVALID_PASSWORD_ERROR)),
+                of("validuser_3", "NOLOWERCASE1!", PASSWORD, listOf(INVALID_PASSWORD_ERROR)),
+                of("validuser_4", "NoSpecialChar1", PASSWORD, listOf(INVALID_PASSWORD_ERROR)),
+                of("validuser_5", "With space 1!", PASSWORD, listOf(INVALID_PASSWORD_ERROR)),
             )
         }
     }
@@ -86,12 +86,12 @@ class CreateUserTest : BaseTest() {
         username: String,
         password: String,
         keyError: String,
-        valueError: String
+        valueErrors: List<String>
     ) {
         val createUserRequest = CreateUserRequest(username = username, password = password, role = USER)
         CREATE_USER.request(
             auth = { adminAuthSpec() },
-            response = { requestReturnsBadRequestWithError(keyError, valueError) },
+            response = { requestReturnsBadRequestWithError(keyError, valueErrors) },
             requestBody = createUserRequest,
             method = POST
         )
@@ -100,7 +100,7 @@ class CreateUserTest : BaseTest() {
     //может админ и может создавать, я бы уточнила
     @Test
     @DisplayName("Negative test: admin cannot create admin-user")
-    fun adminCanCreateUserWithInvalidData() {
+    fun adminCannotCreateAdminUser() {
         val createUserRequest = generate<CreateUserRequest>(mapOf("role" to UserRole.ADMIN))
         CREATE_USER.request(
             auth = { adminAuthSpec() },

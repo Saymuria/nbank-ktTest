@@ -23,17 +23,12 @@ import java.util.stream.Stream
 @DisplayName("Check user name editing")
 class EditProfileTest : BaseTest() {
 
-    //Не понятно какие валидации для name, но разделила бы так
     companion object {
         @JvmStatic
         fun validNames(): Stream<Arguments> {
             return Stream.of(
-                of("A"), //минимальная длина
-                of("John"),
-                of("Анна"), //кириллица
+                of("a b"), //минимальная длина
                 of("John Doe"), //с пробелом
-                of("O'Connor"), //с апострофом
-                of("a".repeat(10)) //максимальная длина
             )
         }
 
@@ -41,9 +36,19 @@ class EditProfileTest : BaseTest() {
         fun invalidNames(): Stream<Arguments> {
             return Stream.of(
                 of("   "), //только пробелы
-                of("a".repeat(11)), //слишком длинное
-                of("John@Doe"), //запрещенный символ
-                of("12345") //только цифры
+                of("John"), //одно слово
+                of("John Middle Smith "), //три слова
+                of("12345 1111"), //только цифры с пробелом
+                of("John_Smith"),//нижнее подчеркивание вместо пробела
+                of("John  Smith"), //два пробела подряд
+                of("John Smith "), // пробел в конце
+                of(" John Smith"), //пробел в начале
+                of("John Smith"),//неразрывный пробел
+                of("John1 Smith1"), //c цифрами внутри в двух словах
+                of("O'Connor I'Fart"), // c апострофами
+                of("John-Eaton Smith"),//c двойным именем
+                of("Иван Иванов"), // кириллица
+                of("山田 太郎") //иероглифы
             )
         }
     }
@@ -88,7 +93,7 @@ class EditProfileTest : BaseTest() {
         val getCustomerProfileResponse = GET_CUSTOMER_PROFILE.validatedRequest<GetCustomerProfileResponse>(
             auth = { authAsUser(user.username, user.originalPassword) },
             method = GET
-        ).name ?: throw NullPointerException("Name is null")
+        )
         updateCustomerProfileResponse shouldMatchResponse getCustomerProfileResponse
     }
 

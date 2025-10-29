@@ -1,7 +1,10 @@
 package uiTest
 
 import common.annotations.UserSession
-import dsl.*
+import dsl.deposit
+import dsl.getAllAccounts
+import dsl.invoke
+import dsl.updateProfileName
 import framework.generators.ValueGenerator
 import framework.utils.generate
 import models.accounts.deposit.DepositMoneyRequest
@@ -74,6 +77,12 @@ class TransferTest : BaseUiTest() {
                 receiverAccount = receiverAccount.accountNumber,
                 transferSum = transferSum
             )
+            checkAlertMessageAndAccept(
+                BankAlerts.SUCCESSFUL_TRANSFER.format(
+                    transferSum,
+                    receiverAccount.accountNumber
+                )
+            )
         }
 
         val receiverBalance =
@@ -93,9 +102,9 @@ class TransferTest : BaseUiTest() {
         val receiverAccount = receiverUser.getAccount()
 
         val receiverName = receiverUser.updateProfileName(generate<UpdateCustomerProfileRequest>())
-        val depositSum = BigDecimal("10000.0")
+        val depositSum = BigDecimal("5000.0")
         senderUser.deposit(generate<DepositMoneyRequest>(mapOf("id" to senderAccount.id, "balance" to depositSum)))
-        val transferSum = "6000.0"
+        val transferSum = "0.99"
         userDashboard {
             open()
             redirectToTransferPage()
@@ -158,7 +167,7 @@ class TransferTest : BaseUiTest() {
         receiverUser.updateProfileName(generate<UpdateCustomerProfileRequest>())
         val depositSum = BigDecimal("5000.0")
         senderUser.deposit(generate<DepositMoneyRequest>(mapOf("id" to senderAccount.id, "balance" to depositSum)))
-        val transferSum = "6000.0"
+        val transferSum = "4000.0"
         userDashboard {
             open()
             redirectToTransferPage()

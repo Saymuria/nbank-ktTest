@@ -2,9 +2,7 @@ package framework.specs
 
 import io.restassured.builder.ResponseSpecBuilder
 import io.restassured.specification.ResponseSpecification
-import org.apache.http.HttpStatus.SC_BAD_REQUEST
-import org.apache.http.HttpStatus.SC_CREATED
-import org.apache.http.HttpStatus.SC_OK
+import org.apache.http.HttpStatus.*
 import org.hamcrest.Matchers
 
 class ResponseSpec {
@@ -25,10 +23,10 @@ class ResponseSpec {
                 .build()
         }
 
-        fun requestReturnsBadRequestWithError(errorKey: String, errorValue: String): ResponseSpecification {
+        fun requestReturnsBadRequestWithError(errorKey: String, errorValues: List<String>): ResponseSpecification {
             return defaultResponseBuilder()
                 .expectStatusCode(SC_BAD_REQUEST)
-                .expectBody(errorKey, Matchers.equalTo(errorValue))
+                .expectBody(errorKey, Matchers.hasItems(*errorValues.toTypedArray()))
                 .build()
         }
 

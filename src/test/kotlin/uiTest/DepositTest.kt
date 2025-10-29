@@ -2,7 +2,6 @@ package uiTest
 
 import com.codeborne.selenide.Condition
 import common.annotations.UserSession
-import dsl.createAccount
 import dsl.deposit
 import dsl.getAllAccounts
 import dsl.invoke
@@ -39,7 +38,7 @@ class DepositTest : BaseUiTest() {
     @Test
     @UserSession(withAccount = true)
     fun userCanMakeDepositWithInValidSumTest() {
-        val depositSum = "10000.01"
+        val depositSum = "5000.01"
         val user = SessionStorage.getUser()
         val account = user.getAccount()
         userDashboard {

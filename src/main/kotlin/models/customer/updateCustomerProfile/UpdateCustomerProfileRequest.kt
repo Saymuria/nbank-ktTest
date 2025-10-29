@@ -4,6 +4,6 @@ import framework.generators.GeneratingRule
 import models.BaseModel
 
 data class UpdateCustomerProfileRequest (
-    @GeneratingRule("[a-zA-Z]")
+    @GeneratingRule("^[A-Za-z]+\\s[A-Za-z]+$")
     val name : String
 ) : BaseModel

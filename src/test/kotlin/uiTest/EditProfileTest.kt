@@ -9,7 +9,6 @@ import models.customer.updateCustomerProfile.UpdateCustomerProfileRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import storage.SessionStorage
-import ui.pages.BankAlerts
 import ui.pages.BankAlerts.*
 import ui.pages.EditProfilePage
 import ui.pages.UserDashboard
