@@ -9,21 +9,16 @@ import framework.utils.generate
 import models.admin.createUser.CreateUserRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.parallel.Execution
-import org.junit.jupiter.api.parallel.ExecutionMode
 import steps.AdminSteps.Companion.getAllUsers
 import ui.pages.AdminPanel
 import ui.pages.BankAlerts
 import ui.pages.BankAlerts.USER_CREATED_SUCCESSFULLY
-import ui.pages.UserDashboard
-import kotlin.lazy
 
 class CreateUserTest : BaseUiTest() {
     val adminPanel  by lazy { AdminPanel() }
 
     @Test
     @AdminSession
-    @Execution(ExecutionMode.SAME_THREAD)
     fun adminCanCreateUser() {
         adminPanel {
             open()
@@ -45,7 +40,6 @@ class CreateUserTest : BaseUiTest() {
 
     @Test
     @AdminSession
-    @Execution(ExecutionMode.SAME_THREAD)
     fun adminCannotCreateUserWithInvalidDataTest() {
         adminPanel {
             open()
