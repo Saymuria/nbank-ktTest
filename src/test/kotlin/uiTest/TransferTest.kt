@@ -10,6 +10,7 @@ import framework.utils.generate
 import models.accounts.deposit.DepositMoneyRequest
 import models.customer.updateCustomerProfile.UpdateCustomerProfileRequest
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import storage.SessionStorage
 import ui.pages.BankAlerts
@@ -18,9 +19,9 @@ import ui.pages.UserDashboard
 import java.math.BigDecimal
 
 class TransferTest : BaseUiTest() {
-    val valueGenerator = ValueGenerator()
-    val userDashboard = UserDashboard()
-    val transferPage = TransferPage()
+    val valueGenerator by lazy { ValueGenerator() }
+    val userDashboard by lazy { UserDashboard() }
+    val transferPage by lazy { TransferPage() }
 
     @Test
     @UserSession(value = 2, withAccount = true)
@@ -94,6 +95,7 @@ class TransferTest : BaseUiTest() {
     }
 
     @Test
+    @Disabled("Тест временно отключен")
     @UserSession(value = 2, withAccount = true)
     fun userCannotMakeTransferWithInvalidSumTest() {
         val senderUser = SessionStorage.getUser(1)

@@ -14,8 +14,8 @@ import ui.pages.EditProfilePage
 import ui.pages.UserDashboard
 
 class EditProfileTest : BaseUiTest() {
-    val userDashboard = UserDashboard()
-    val editProfilePage = EditProfilePage()
+    val userDashboard by lazy { UserDashboard() }
+    val editProfilePage by lazy { EditProfilePage() }
 
     @Test
     @UserSession
