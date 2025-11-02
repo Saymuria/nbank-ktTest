@@ -9,7 +9,7 @@ enum class BankAlerts(val message: String) {
     ACCOUNT_SELECTION_NEEDED("Please select an account."),
     FILLING_VALID_SUM_NEEDED("Please enter a valid amount."),
     NAME_UPDATED_SUCCESSFULLY("✅ Name updated successfully!"),
-    INVALID_NAME("Name should be valid"),
+    INVALID_NAME("Name must contain two words with letters only"),
     FILLING_VALID_NAME("❌ Please enter a valid name."),
     SAME_NAME_IS_NOT_UPDATED("⚠️ New name is the same as the current one."),
     SUCCESSFUL_TRANSFER("Successfully transferred \$%s to account %s!"),

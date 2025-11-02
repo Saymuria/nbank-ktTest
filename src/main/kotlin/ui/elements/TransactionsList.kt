@@ -1,10 +1,21 @@
 package ui.elements
 
-import com.codeborne.selenide.Selectors
 import com.codeborne.selenide.SelenideElement
 
 class TransactionElement(element: SelenideElement) : BaseElement(element) {
-    fun hasType(type: String): Boolean = element.find(Selectors.byText(type)).exists()
-    fun hasSum(sum: String): Boolean = element.find(Selectors.byText(sum)).exists()
-    fun clickRepeat() = element.find(Selectors.byText("🔁 Repeat")).click()
+    private val transactionType: String =
+        element.find("span").text().split(" - ")[0].trim()
+
+
+    private val transactionSum: String =
+        element.find("span").text().split(" - ")[1].split("\n")[0].trim()
+
+
+    private val repeatButton: SelenideElement =
+        element.find("button.custom-btn")
+
+
+    fun getTransactionType() = transactionType
+    fun getTransactionSum() = transactionSum
+    fun clickRepeat() = repeatButton.click()
 }
