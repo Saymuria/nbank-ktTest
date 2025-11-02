@@ -10,7 +10,7 @@ import ui.pages.BankAlerts.NEW_ACCOUNT_CREATED
 import ui.pages.UserDashboard
 
 class CreateAccountTest : BaseUiTest() {
-    val userDashboard = UserDashboard()
+    val userDashboard by lazy { UserDashboard() }
 
     @Test
     @UserSession

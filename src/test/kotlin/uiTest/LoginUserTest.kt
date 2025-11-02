@@ -11,7 +11,7 @@ import ui.pages.LoginPage
 import ui.pages.UserDashboard
 
 class LoginUserTest : BaseUiTest() {
-    val loginPage = LoginPage()
+    val loginPage by lazy { LoginPage() }
 
 
     @Test
