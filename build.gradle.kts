@@ -77,4 +77,13 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
- }
+    outputs.upToDateWhen { false }
+    // Определяем какие тесты запускать в зависимости от профиля
+    if (project.hasProperty("profile")) {
+        val profile = project.property("profile") as String
+        when (profile) {
+            "api" -> include("**/apiTest/**/*Test.class")
+            "ui" -> include("**/uiTest/*Test.class")
+        }
+    }
+}

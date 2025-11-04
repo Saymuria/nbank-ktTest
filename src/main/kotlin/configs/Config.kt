@@ -12,9 +12,16 @@ object Config {
                 ?: throw RuntimeException("config.properties not found in resources")
             input.use { properties.load(it) }
         } catch (e: IOException) {
-            throw RuntimeException("Fail to load config.properties",e)
+            throw RuntimeException("Fail to load config.properties", e)
         }
     }
 
-    fun getProperty(key: String): String = properties.getProperty(key)
+    fun getProperty(key: String): String {
+        val systemValue = System.getProperty(key)
+        if (systemValue != null) return systemValue
+
+        val envValue = System.getenv(key.toUpperCase().replace(".", "_"))
+        if (envValue != null) return envValue
+        return properties.getProperty(key)
+    }
 }
