@@ -17,8 +17,12 @@ jobs:
       - name: Chache gradle repository
         uses: gradle/actions/setup-gradle@v4
         with:
-            cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
       - name: Set up services
         run: cd infra/docker_compose && bash restart_docker.sh && cd ../..
       - name: Run tests
         run: ./gradlew clean test
+        env:
+          APIBASEURL: http://backend:4111
+          UIBASEURL: http://frontend:80
+          UIREMOTE: http://selenoid:4444/wd/hub
