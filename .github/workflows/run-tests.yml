@@ -8,9 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps: #шаги конректной джобы
       - name: Checkout repository #копируем файлы репозитория внутрь СI агента
-        uses: actions/checkout@4
+        uses: actions/checkout@v4
       - name: Set up jdk
-        uses: actions/setup-java@4
+        uses: actions/setup-java@v4
         with:
           distribution: 'corretto'
           java-version: '21'
