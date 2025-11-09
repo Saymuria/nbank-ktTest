@@ -29,7 +29,7 @@ docker run --rm \
   -v "$TEST_OUTPUT_DIR/report":/app/build/reports/tests \
   -e TEST_PROFILE="$TEST_PROFILE" \
   -e APIBASEURL=http://backend:4111 \
-  -e UIBASEURL=http://nginx:80 \
+  -e UIBASEURL=http://frontend:80 \
   -e UIREMOTE=http://selenoid:4444/wd/hub \
 $IMAGE_NAME
 
