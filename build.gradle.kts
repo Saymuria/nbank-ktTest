@@ -84,6 +84,7 @@ tasks.test {
         when (profile) {
             "api" -> include("**/apiTest/**/*Test.class")
             "ui" -> include("**/uiTest/*Test.class")
+            "all" -> include("**/apiTest/**/*Test.class", "**/uiTest/*Test.class")
         }
     }
 }
