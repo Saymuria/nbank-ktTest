@@ -1,0 +1,24 @@
+name: Run tests
+
+#триггер
+on: [ push, workflow_dispatch ]
+jobs:
+  run-tests: #аналог этапов
+    name: Set up services (review apps) and run tests
+    runs-on: ubuntu-latest
+    steps: #шаги конректной джобы
+      - name: Checkout repository #копируем файлы репозитория внутрь СI агента
+        uses: actions/checkout@4
+      - name: Set up jdk
+        uses: actions/setup-java@4
+        with:
+          distribution: 'corretto'
+          java-version: '21'
+      - name: Chache gradle repository
+        uses: gradle/actions/setup-gradle@v4
+        with:
+            cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+      - name: Set up services
+        run: bash infra/docker_compose/restart_docker.sh
+      - name: Run tests
+        run: ./gradlew clean test
