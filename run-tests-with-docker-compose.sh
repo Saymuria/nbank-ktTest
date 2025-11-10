@@ -8,8 +8,7 @@ TEST_OUTPUT_DIR=./test-output/$TIMESTAMP
 NETWORK_NAME="nbank-network"
 
 echo ">>> Подготовка и запуск тестового окружения"
-./restart_docker.sh
-
+cd infra/docker_compose && bash restart_docker.sh && cd ../..
 #Если необходимо запустить тесты с мастера
 #echo "Спуливаем образ Docker образ тестов: $IMAGE_NAME"
 #docker pull saymuria/$IMAGE_NAME

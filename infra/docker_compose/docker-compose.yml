@@ -7,8 +7,8 @@ services:
       - nbank-network
 
   frontend:
-    image: nobugsme/nbank-ui:latest
-    expose: #не открываем порт наружу, a даем доступ контейнерам в сети (безопасность), если открыть наружу, то запросы будут видны всем
+    image: nobugsme/nbank-ui:with_nginx
+    ports: #не открываем порт наружу, a даем доступ контейнерам в сети (безопасность), если открыть наружу, то запросы будут видны всем
       - "3000:80"
     depends_on:
       - backend
