@@ -9,7 +9,7 @@ NETWORK_NAME="nbank-network"
 
 echo ">>> Подготовка и запуск тестового окружения"
 cd infra/docker_compose && bash restart_docker.sh && cd ../..
-#Если необходимо запустить тесты с мастера
+#Если необходимо запустить тесты с собранного докер образа
 echo "Спуливаем образ Docker образ тестов: $IMAGE_NAME"
 docker pull saymuria/$IMAGE_NAME
 
@@ -29,8 +29,7 @@ docker run --rm \
   -e TEST_PROFILE="$TEST_PROFILE" \
   -e APIBASEURL=http://backend:4111 \
   -e UIBASEURL=http://frontend:80 \
-  -e UIREMOTE=http://selenoid:4444/wd/hub \
-$IMAGE_NAME
+saymuria/$IMAGE_NAME
 
 echo "Тесты завершены"
 echo "Лог файл: $TEST_OUTPUT_DIR/logs"

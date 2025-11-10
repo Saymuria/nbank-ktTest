@@ -4,7 +4,7 @@ import common.annotations.Browsers
 import common.annotations.UserSession
 import dsl.invoke
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.RepeatedTest
 import storage.SessionStorage
 import ui.pages.BankAlerts.NEW_ACCOUNT_CREATED
 import ui.pages.UserDashboard
@@ -12,12 +12,14 @@ import ui.pages.UserDashboard
 class CreateAccountTest : BaseUiTest() {
     val userDashboard by lazy { UserDashboard() }
 
-    @Test
+    @RepeatedTest(10)
     @UserSession
     @Browsers(["chrome"])
     fun userCanCreateAccountTest() {
+        val defaultName = "noname"
         userDashboard {
             open()
+            checkWelcomeText(defaultName)
             createNewAccount()
         }
         val existingUserAccount = SessionStorage.getSteps().getAllAccounts()
