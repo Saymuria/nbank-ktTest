@@ -16,8 +16,10 @@ class CreateAccountTest : BaseUiTest() {
     @UserSession
     @Browsers(["chrome"])
     fun userCanCreateAccountTest() {
+        val defaultName = "noname"
         userDashboard {
             open()
+            checkWelcomeText(defaultName)
             createNewAccount()
         }
         val existingUserAccount = SessionStorage.getSteps().getAllAccounts()
