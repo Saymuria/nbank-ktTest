@@ -47,3 +47,5 @@ bin/
 # .gitignore
 .env
 *.env
+# тестовые запуски
+/test-output/
