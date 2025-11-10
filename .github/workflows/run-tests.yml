@@ -25,3 +25,9 @@ jobs:
         env:
           APIBASEURL: http://localhost:4111
           UIBASEURL: http://frontend:80
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: build/reports/tests/
+          retention-days: 1
