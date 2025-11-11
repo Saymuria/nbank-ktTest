@@ -3,6 +3,8 @@ package ui.pages
 import com.codeborne.selenide.Selectors
 import com.codeborne.selenide.Selenide.`$`
 import common.RetryUtils.retry
+import hellpers.step
+import hellpers.stepWithResult
 import ui.elements.UserBage
 
 class AdminPanel : BasePage<AdminPanel>() {
@@ -15,21 +17,21 @@ class AdminPanel : BasePage<AdminPanel>() {
         return "/admin"
     }
 
-    fun createUser(username: String, password: String): AdminPanel {
+    fun createUser(username: String, password: String): AdminPanel = stepWithResult("Admin Panel: Создание пользователя") {
         usernameInput.sendKeys(username)
         passwordInput.sendKeys(password)
         addUserButton.click()
-        return this
+        this
     }
 
-    fun getAllUsers(): List<UserBage> {
+    fun getAllUsers(): List<UserBage> = stepWithResult("Admin Panel: Получение списка пользователей") {
         val elementsCollection = `$`(Selectors.byText("All Users")).parent().findAll("li")
         println(elementsCollection)
-        return generatePageElements(elementsCollection, ::UserBage)
+        generatePageElements(elementsCollection, ::UserBage)
     }
 
-    fun userBageByUsername(username: String): UserBage {
-        return retry(
+    fun userBageByUsername(username: String): UserBage = stepWithResult("Admin Panel: Поиск пользователя") {
+        retry(
             action = {
                 getAllUsers().find { user -> user.getUsername() == username }
                     ?: throw NoSuchElementException("User '$username' not found")

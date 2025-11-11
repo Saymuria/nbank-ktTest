@@ -1,15 +1,11 @@
 package ui.pages
 
-import com.codeborne.selenide.Condition
-import com.codeborne.selenide.ElementsCollection
-import com.codeborne.selenide.Selectors
-import com.codeborne.selenide.Selenide
-import com.codeborne.selenide.Selenide.`$`
-import com.codeborne.selenide.Selenide.executeJavaScript
-import com.codeborne.selenide.Selenide.switchTo
-import com.codeborne.selenide.SelenideElement
+import com.codeborne.selenide.*
+import com.codeborne.selenide.Selenide.*
 import dsl.TestUser
 import framework.specs.RequestSpecs.Companion.getUserAuthHeader
+import hellpers.step
+import hellpers.stepWithResult
 import models.authentication.LoginUserRequest
 import org.assertj.core.api.Assertions.assertThat
 import ui.elements.BaseElement
@@ -25,7 +21,7 @@ abstract class BasePage<T : BasePage<T>> {
     protected val amountInput = `$`(Selectors.byAttribute("placeholder", "Enter amount"))
 
     companion object {
-        fun authorizeAsUser(username: String, password: String) {
+        fun authorizeAsUser(username: String, password: String) = stepWithResult("Авторизация пользователя") {
             Selenide.open("/")
             val authHeader = getUserAuthHeader(username, password)
             executeJavaScript<Any>("localStorage.setItem('authToken', arguments[0])", authHeader)
@@ -42,45 +38,43 @@ abstract class BasePage<T : BasePage<T>> {
 
 
     @Suppress("UNCHECKED_CAST")
-    fun open(): T = Selenide.open(url(), this::class.java as Class<T>)
+    fun open(): T = stepWithResult("Открываем страницу ${url()}") { Selenide.open(url(), this::class.java as Class<T>) }
 
     fun <T : BasePage<T>> getPage(pageClass: Class<T>): T {
         return Selenide.page(pageClass)
     }
 
-    fun checkAlertMessageAndAccept(bankAlert: String): T {
+    fun checkAlertMessageAndAccept(bankAlert: String): T = step("Проверка алерта") {
         val alert = switchTo().alert()
         assertThat(alert.text).contains(bankAlert)
         alert.accept()
-        return this as T
+        this as T
     }
 
-    fun redirectToEditProfilePage(): T {
+    fun redirectToEditProfilePage(): T = stepWithResult("Переход на страницу редактирования профиля") {
         userNameButton.click()
-        return this as T
+        this as T
     }
 
-    fun clickToHomeButton(): T {
+    fun clickToHomeButton(): T = stepWithResult("Нажимаем на кнопку 'Домой'") {
         homeButton.click()
-        return this as T
+        this as T
     }
 
-    fun logout(): T {
+    fun logout(): T = stepWithResult("Разлогин") {
         logoutButton.click()
-        return this as T
+        this as T
     }
 
-    fun refreshAndCheckUserName(name: String): T {
-        Selenide.refresh()
+    fun refreshAndCheckUserName(name: String): T = stepWithResult("Проверяем username") {
+        refresh()
         userNameButton.shouldBe(Condition.visible).shouldHave(Condition.text(name))
-        return this as T
+        this as T
     }
-
 
     //ElementCollection -> List<BaseElement>
     protected inline fun <reified T : BaseElement> generatePageElements(
         elementsCollection: ElementsCollection,
         constructor: (SelenideElement) -> T
     ) = elementsCollection.map(constructor)
-
 }

@@ -3,6 +3,7 @@ package ui.pages
 import com.codeborne.selenide.Condition
 import com.codeborne.selenide.Selectors
 import com.codeborne.selenide.Selenide.`$`
+import hellpers.stepWithResult
 
 class UserDashboard : BasePage<UserDashboard>() {
     private val welcomeText = `$`(Selectors.byClassName("welcome-text"))
@@ -14,23 +15,23 @@ class UserDashboard : BasePage<UserDashboard>() {
         return "/dashboard"
     }
 
-    fun createNewAccount(): UserDashboard {
+    fun createNewAccount(): UserDashboard = stepWithResult("Создание счет") {
         createNewAccount.click()
-        return this
+        this
     }
 
-    fun redirectToDepositPage(): UserDashboard {
+    fun redirectToDepositPage(): UserDashboard = stepWithResult("Переход на страницу пополнение") {
         deposit.click()
-        return this
+        this
     }
 
-    fun checkWelcomeText(name: String): UserDashboard {
+    fun checkWelcomeText(name: String): UserDashboard = stepWithResult("Проверка приветственного сообщения") {
         welcomeText.shouldBe(Condition.visible).shouldHave(Condition.text("Welcome, $name!"))
-        return this
+        this
     }
 
-    fun redirectToTransferPage(): UserDashboard {
+    fun redirectToTransferPage(): UserDashboard = stepWithResult("Переход на страницу перевода") {
         transfer.click()
-        return this
+        this
     }
 }

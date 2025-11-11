@@ -4,6 +4,8 @@ import com.codeborne.selenide.Condition
 import com.codeborne.selenide.Selectors
 import com.codeborne.selenide.Selenide.`$`
 import common.RetryUtils.retry
+import hellpers.step
+import hellpers.stepWithResult
 
 
 class EditProfilePage : BasePage<EditProfilePage>() {
@@ -14,7 +16,7 @@ class EditProfilePage : BasePage<EditProfilePage>() {
         return "/edit-profile"
     }
 
-    fun setName(name: String): EditProfilePage {
+    fun setName(name: String): EditProfilePage = stepWithResult("Установка имени счета") {
         editProfileTitle.shouldBe(Condition.visible)
         retry(
             action = {
@@ -29,22 +31,22 @@ class EditProfilePage : BasePage<EditProfilePage>() {
             delay = 1000
         )
         saveChangesButton.click()
-        return this
+        this
     }
 
-    fun changeName(name: String, newName: String): EditProfilePage {
+    fun changeName(name: String, newName: String): EditProfilePage = stepWithResult("Изменение имени счета") {
         editProfileTitle.shouldBe(Condition.visible)
         enterNameInput.click()
         enterNameInput.shouldHave(Condition.value(name))
         enterNameInput.clear()
         enterNameInput.sendKeys(newName)
         saveChangesButton.click()
-        return this
+        this
     }
 
-    fun tryToSubmitEmptyInputName(): EditProfilePage {
+    fun tryToSubmitEmptyInputName(): EditProfilePage = stepWithResult("Сабмит пустой формы редактирования профиля") {
         editProfileTitle.shouldBe(Condition.visible)
         saveChangesButton.click()
-        return this
+        this
     }
 }
