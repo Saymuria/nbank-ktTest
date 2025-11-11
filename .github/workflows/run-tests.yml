@@ -21,7 +21,7 @@ jobs:
       - name: Set up services
         run: cd infra/docker_compose && bash restart_docker.sh && cd ../..
       - name: Install Allure
-        uses: simple-elf/allure-report-action@v1.7
+        uses: simple-elf/allure-report-action@master
         with:
          allure-version: 2.27.0
       - name: Run tests
