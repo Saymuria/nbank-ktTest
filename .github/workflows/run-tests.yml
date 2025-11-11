@@ -31,7 +31,7 @@ jobs:
           UIBASEURL: http://frontend:80
       - name: Generate Allure report
         run: |
-         allure generate target/allure-results -o build/allure-report --clean
+         allure generate target/allure-results --clean
       - name: Upload test reports
         uses: actions/upload-artifact@v4
         if: always()
@@ -44,5 +44,5 @@ jobs:
         if: always()
         with:
           name: allure-report
-          path: build/allure-report/
+          path: target/allure-results/
           retention-days: 1
