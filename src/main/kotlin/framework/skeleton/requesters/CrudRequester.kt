@@ -3,6 +3,7 @@ package framework.skeleton.requesters
 import framework.skeleton.Endpoint
 import framework.skeleton.HttpRequest
 import framework.skeleton.interfaces.CrudEndpointInterface
+import hellpers.step
 import io.restassured.RestAssured.given
 import io.restassured.response.ValidatableResponse
 import io.restassured.specification.RequestSpecification
@@ -14,9 +15,9 @@ class CrudRequester(
     responseSpecification: ResponseSpecification, endpoint: Endpoint
 ) : HttpRequest(requestSpecification, responseSpecification, endpoint), CrudEndpointInterface {
 
-    override fun post(model: BaseModel?): ValidatableResponse {
+    override fun post(model: BaseModel?): ValidatableResponse = step("Отправляем POST запрос ${endpoint.url}") {
         val body = model ?: ""
-        return given()
+        given()
             .spec(requestSpecification)
             .body(body)
             .post(endpoint.url)
@@ -25,13 +26,13 @@ class CrudRequester(
             .spec(responseSpecification)
     }
 
-    override fun get(id: Long?): ValidatableResponse {
+    override fun get(id: Long?): ValidatableResponse = step("Отправляем GET запрос ${endpoint.url} id=$id") {
         val url = if (id != null) {
             String.format(endpoint.url, id)
         } else {
             endpoint.url
         }
-        return given()
+        given()
             .spec(requestSpecification)
             .get(url)
             .then()
@@ -39,29 +40,31 @@ class CrudRequester(
             .spec(responseSpecification)
     }
 
-    override fun update(id: Long?, model: BaseModel?): ValidatableResponse {
-        val body = model ?: ""
-        val url = if (id != null) {
-            String.format(endpoint.url, id)
-        } else {
-            endpoint.url
+    override fun update(id: Long?, model: BaseModel?): ValidatableResponse =
+        step("Отправляем PUT запрос ${endpoint.url} id=$id") {
+            val body = model ?: ""
+            val url = if (id != null) {
+                String.format(endpoint.url, id)
+            } else {
+                endpoint.url
+            }
+            given()
+                .spec(requestSpecification)
+                .body(body)
+                .put(url)
+                .then()
+                .assertThat()
+                .spec(responseSpecification)
         }
-        return given()
-            .spec(requestSpecification)
-            .body(body)
-            .put(url)
-            .then()
-            .assertThat()
-            .spec(responseSpecification)
-    }
 
-    override fun delete(id: Long?): ValidatableResponse {
+    override fun delete(id: Long?): ValidatableResponse =
+        step("Отправляем DELETE запрос ${endpoint.url} id=$id") {
         val url = if (id != null) {
             String.format(endpoint.url, id)
         } else {
             endpoint.url
         }
-        return given()
+        given()
             .spec(requestSpecification)
             .delete(url)
             .then()

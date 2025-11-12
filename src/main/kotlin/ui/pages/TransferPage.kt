@@ -1,9 +1,9 @@
 package ui.pages
 
 import com.codeborne.selenide.Condition
-import com.codeborne.selenide.ElementsCollection
 import com.codeborne.selenide.Selectors
 import com.codeborne.selenide.Selenide.`$`
+import hellpers.stepWithResult
 import ui.elements.TransactionElement
 
 class TransferPage : BasePage<TransferPage>() {
@@ -27,7 +27,7 @@ class TransferPage : BasePage<TransferPage>() {
         receiverName: String? = "",
         receiverAccount: String,
         transferSum: String
-    ): TransferPage {
+    ): TransferPage = stepWithResult("Перевод со счета $senderAccount на счет $receiverAccount") {
         transferTitle.shouldBe(Condition.visible)
         accountSelect.click()
         accountSelect.selectOptionContainingText(senderAccount)
@@ -37,42 +37,42 @@ class TransferPage : BasePage<TransferPage>() {
         confirmCheckText.shouldBe(Condition.exactText("Confirm details are correct"))
         confirmCheckbox.click()
         transferButton.click()
-        return this
+        this
     }
 
-    fun tryToSubmitEmptyTransferForm(): TransferPage {
+    fun tryToSubmitEmptyTransferForm(): TransferPage = stepWithResult("Сабмит пустой формы перевода") {
         transferTitle.shouldBe(Condition.visible)
         transferButton.click()
-        return this
+        this
     }
 
-    fun getAllTransactions(): List<TransactionElement> {
+    fun getAllTransactions(): List<TransactionElement> = stepWithResult("Получение всех транзакций пользователя") {
         val elementsCollection = `$`(Selectors.byText("Matching Transactions")).parent().findAll("li")
-        return generatePageElements(elementsCollection, ::TransactionElement)
+        generatePageElements(elementsCollection, ::TransactionElement)
     }
 
 
-    fun openTransferAgain(): TransferPage {
+    fun openTransferAgain(): TransferPage = stepWithResult("Повторный перевод") {
         transferTitle.shouldBe(Condition.visible)
         transferAgainButton.click()
         matchingTransactionsTitle.shouldBe(Condition.visible)
-        return this
+        this
     }
 
-    fun searchTransactions(name: String): TransferPage {
+    fun searchTransactions(name: String): TransferPage = stepWithResult("Поиск перевода") {
         findTransactionInput.clear()
         findTransactionInput.sendKeys(name)
         searchTransactionButton.click()
-        return this
+        this
     }
 
-    fun makeTransferAgain(senderAccount: String): TransferPage {
+    fun makeTransferAgain(senderAccount: String): TransferPage = stepWithResult("Повторный перевод перевода") {
         modalTitle.shouldHave(Condition.exactText("🔁 Repeat Transfer"))
         accountSelect.click()
         accountSelect.selectOptionContainingText(senderAccount)
         confirmCheckText.shouldBe(Condition.exactText("Confirm details are correct"))
         confirmCheckbox.click()
         transferButton.click()
-        return this
+        this
     }
 }

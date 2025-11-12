@@ -10,6 +10,7 @@ import framework.skeleton.requesters.ValidatedCrudRequester
 import framework.specs.RequestSpecs.Companion.authAsUser
 import framework.specs.ResponseSpec.Companion.entityWasCreated
 import framework.specs.ResponseSpec.Companion.requestReturnOk
+import hellpers.step
 import io.restassured.http.Method.GET
 import models.accounts.createAccount.CreateAccountResponse
 import models.accounts.deposit.DepositMoneyRequest
@@ -23,31 +24,32 @@ import models.customer.updateCustomerProfile.UpdateCustomerProfileResponse
 
 class UserSteps(val username: String, val password: String) {
 
-    fun createAccount(): CreateAccountResponse {
-        return ValidatedCrudRequester<CreateAccountResponse>(
+    fun createAccount(): CreateAccountResponse = step("User: Создание аккаунта") {
+        ValidatedCrudRequester<CreateAccountResponse>(
             authAsUser(username, password),
             entityWasCreated(), CREATE_ACCOUNT
         ).post(null)
     }
 
-    fun makeDeposit(request: DepositMoneyRequest): DepositMoneyResponse {
-        return ValidatedCrudRequester<DepositMoneyResponse>(
+    fun makeDeposit(request: DepositMoneyRequest): DepositMoneyResponse = step("User: Пополнение счета ${request.id}") {
+        ValidatedCrudRequester<DepositMoneyResponse>(
             authAsUser(username, password),
             requestReturnOk(),
             Endpoint.DEPOSIT_MONEY
         ).post(request)
     }
 
-    fun makeTransfer(request: TransferMoneyRequest): TransferMoneyResponse {
-        return ValidatedCrudRequester<TransferMoneyResponse>(
-            authAsUser(username, password),
-            requestReturnOk(),
-            Endpoint.TRANSFER_MONEY
-        ).post(request)
-    }
+    fun makeTransfer(request: TransferMoneyRequest): TransferMoneyResponse =
+        step("User: Перевод денег со счета ${request.senderAccountId} на счет ${request.receiverAccountId}") {
+            ValidatedCrudRequester<TransferMoneyResponse>(
+                authAsUser(username, password),
+                requestReturnOk(),
+                Endpoint.TRANSFER_MONEY
+            ).post(request)
+        }
 
-    fun updateName(request: UpdateCustomerProfileRequest): UpdateCustomerProfileResponse {
-        return ValidatedCrudRequester<UpdateCustomerProfileResponse>(
+    fun updateName(request: UpdateCustomerProfileRequest): UpdateCustomerProfileResponse = step("User: Изменение имени аккаунта ${request.name}")  {
+        ValidatedCrudRequester<UpdateCustomerProfileResponse>(
             authAsUser(username, password),
             requestReturnOk(),
             UPDATE_CUSTOMER_PROFILE

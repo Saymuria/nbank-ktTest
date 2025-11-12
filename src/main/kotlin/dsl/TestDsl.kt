@@ -45,9 +45,6 @@ fun createUser(): TestUser {
     return TestUser(userResponse, originalPassword)
 }
 
-//fun createAccount(user: TestUser): CreateAccountResponse {
-//    return user.userSteps.createAccount()
-//}
 
 fun createUserWithAccount(): TestUser {
     val user = createUser()

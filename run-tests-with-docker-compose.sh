@@ -10,15 +10,16 @@ NETWORK_NAME="nbank-network"
 echo ">>> Подготовка и запуск тестового окружения"
 cd infra/docker_compose && bash restart_docker.sh && cd ../..
 #Если необходимо запустить тесты с собранного докер образа
-echo "Спуливаем образ Docker образ тестов: $IMAGE_NAME"
-docker pull saymuria/$IMAGE_NAME
+#echo "Спуливаем образ Docker образ тестов: $IMAGE_NAME"
+#docker pull saymuria/$IMAGE_NAME
 
 #Собираем докер образ - если нужно запустить тесты с dev
-#echo "Собираем Docker образ тестов: $IMAGE_NAME"
-#docker build -t $IMAGE_NAME .
+echo "Собираем Docker образ тестов: $IMAGE_NAME"
+docker build -t $IMAGE_NAME .
 
 mkdir -p "$TEST_OUTPUT_DIR/logs"
 mkdir -p "$TEST_OUTPUT_DIR/report"
+mkdir -p "$TEST_OUTPUT_DIR/allure-report"
 
 # Запуск докер контейнера
 echo "Tесты запущены"
@@ -26,10 +27,11 @@ docker run --rm \
   --network "$NETWORK_NAME" \
   -v "$TEST_OUTPUT_DIR/logs":/app/logs \
   -v "$TEST_OUTPUT_DIR/report":/app/build/reports/tests \
+  -v "$TEST_OUTPUT_DIR/allure-report":/app/target/allure-results \
   -e TEST_PROFILE="$TEST_PROFILE" \
   -e APIBASEURL=http://backend:4111 \
   -e UIBASEURL=http://frontend:80 \
-saymuria/$IMAGE_NAME
+$IMAGE_NAME
 
 echo "Тесты завершены"
 echo "Лог файл: $TEST_OUTPUT_DIR/logs"

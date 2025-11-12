@@ -25,9 +25,9 @@ configurations.all {
 
         // Для JUnit
         force(
-            "org.junit.jupiter:junit-jupiter-api:5.9.3",
-            "org.junit.jupiter:junit-jupiter-params:5.9.3",
-            "org.junit.jupiter:junit-jupiter-engine:5.9.3"
+            "org.junit.jupiter:junit-jupiter-api:5.10.3",
+            "org.junit.jupiter:junit-jupiter-params:5.10.3",
+            "org.junit.jupiter:junit-jupiter-engine:5.10.3"
         )
         force(
             "com.fasterxml.jackson.core:jackson-databind:2.15.3",
@@ -69,9 +69,15 @@ dependencies {
     testImplementation("org.slf4j:slf4j-api:1.7.36")
     testImplementation("org.slf4j:slf4j-simple:1.7.36")
     // Тестирование
-    implementation("org.junit.jupiter:junit-jupiter:5.9.3")
-    implementation("org.junit.platform:junit-platform-engine:1.9.3")
-    implementation("org.junit.jupiter:junit-jupiter-params:5.9.3")
+    implementation("org.junit.jupiter:junit-jupiter:5.10.3")
+    implementation("org.junit.platform:junit-platform-engine:1.10.3")
+    implementation("org.junit.jupiter:junit-jupiter-params:5.10.3")
+
+    //Allure
+    implementation("io.qameta.allure:allure-junit5:2.30.0")
+    implementation("io.qameta.allure:allure-rest-assured:2.30.0")
+    implementation("io.qameta.allure:allure-selenide:2.30.0")
+    implementation("io.qameta.allure:allure-assertj:2.30.0")
     testImplementation(kotlin("test"))
 }
 

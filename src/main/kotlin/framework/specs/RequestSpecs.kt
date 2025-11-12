@@ -3,6 +3,7 @@ package framework.specs
 import configs.Config
 import framework.skeleton.Endpoint
 import framework.skeleton.requesters.CrudRequester
+import io.qameta.allure.restassured.AllureRestAssured
 import io.restassured.builder.RequestSpecBuilder
 import io.restassured.filter.log.RequestLoggingFilter
 import io.restassured.filter.log.ResponseLoggingFilter
@@ -30,7 +31,7 @@ class RequestSpecs {
             return RequestSpecBuilder()
                 .setContentType(ContentType.JSON)
                 .setAccept(ContentType.JSON)
-                .addFilters(listOf(RequestLoggingFilter(), ResponseLoggingFilter()))
+                .addFilters(listOf(RequestLoggingFilter(), ResponseLoggingFilter(), AllureRestAssured()))
                 .setBaseUri(Config.getProperty("apiBaseUrl") + Config.getProperty("apiVersion"))
 
         }
