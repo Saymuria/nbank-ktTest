@@ -44,3 +44,10 @@ jobs:
          allure_results: target/allure-results
          gh_pages: gh-pages
          allure_report: allure-report
+      - name: Upload Allure report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-report
+          path: allure-report/
+          retention-days: 1
